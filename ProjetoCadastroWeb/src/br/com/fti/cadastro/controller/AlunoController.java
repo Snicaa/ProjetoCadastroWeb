@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,7 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class AlunoController {
 	
-	private AlunoDAO dao = new AlunoDAO();
+	private final AlunoDAO dao;
+	
+	@Autowired
+	public AlunoController(AlunoDAO dao){
+		this.dao = dao;
+	}
 	
 	@RequestMapping("cadastrarAluno")
 	public String form() {
@@ -25,10 +31,19 @@ public class AlunoController {
 	@RequestMapping("alunoCadastrado")
 	public String adiciona(@Valid Aluno aluno, BindingResult result, Model model) {
 		
-		if(result.hasFieldErrors()){
-			return"alunos/cadastro";
-		}
 		model.addAttribute("aluno", aluno);
+		
+		if(result.hasFieldErrors()){
+			return"alunos/formulario";
+		}
+		
+		if(!UtilController.validaCpf(aluno.getCpf())){
+			return "alunos/formulario";
+		}
+		
+		if(aluno.getMatricula() > 0){
+			return "redirect:alteraAluno";
+		}
 		dao.cadastrarAluno(aluno);
 		return "alunos/cadastrado";
 	}
@@ -52,7 +67,7 @@ public class AlunoController {
 	@RequestMapping("mostraAluno")
 	public String mostra(Long matricula, Model model) {
 		model.addAttribute("aluno", dao.consultarPorMatricula(matricula));
-		return "alunos/mostra";
+		return "alunos/formulario";
 	}
 	
 	@RequestMapping("alteraAluno")

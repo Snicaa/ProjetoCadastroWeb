@@ -7,87 +7,72 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 
-import javax.naming.NamingException;
+import javax.sql.DataSource;
+
+import org.springframework.stereotype.Repository;
 
 import br.com.fti.cadastro.model.Aluno;
 
+@Repository
 public class AlunoDAO {
 	
-	private BancoDados db = null;
+	private final Connection con;
 	
-	public AlunoDAO() {
+	public AlunoDAO(DataSource dataSource) {
 		try {
-			db = new BancoDados("curso_java");
-		} catch (NamingException e) {
-			System.out.println("Erro ao instanciar o Banco de Dados: " + e);
+			this.con = dataSource.getConnection();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
 		}
 	}
 	
 	public void cadastrarAluno(Aluno aluno) {
 		
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
+		StringBuffer sql = new StringBuffer();
+		
+		sql.append("INSERT INTO alunos (nome, cpf, sexo, datanascimento, endereço, curso, telefone, email, ativo)");
+		sql.append("VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
 		try {
-			conn = db.obterConexao();
-			conn.setAutoCommit(false);
+			con.setAutoCommit(false);
 
-			StringBuffer sql = new StringBuffer();
-			
-			sql.append("INSERT INTO alunos (nome, cpf, sexo, datanascimento, endereço, curso, telefone, email, ativo)");
-			sql.append("VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+			PreparedStatement stmt = con.prepareStatement(sql.toString());	
 
-			stmt = conn.prepareStatement(sql.toString());	
-			
-			String sexo = ""; if (aluno.getSexo() == 'M'){sexo = "Masculino";} else {sexo = "Feminino";}
 			java.sql.Date d = new java.sql.Date(aluno.getDataNascimento().getTime());
 			
 			stmt.setString(1, String.valueOf(aluno.getNome()));
 			stmt.setString(2, String.valueOf(aluno.getCpf()));
-			stmt.setString(3, String.valueOf(sexo));
+			stmt.setString(3, "" + aluno.getSexo());
 			stmt.setDate(4, d);
-			stmt.setString(5, String.valueOf(aluno.getEndereço()));
+			stmt.setString(5, String.valueOf(aluno.getEndereco()));
 			stmt.setString(6, String.valueOf(aluno.getCurso()));
 			stmt.setString(7, String.valueOf(aluno.getTelefone()));
 			stmt.setString(8, String.valueOf(aluno.getEmail()));
 			stmt.setLong(9, 1);
 			
 			stmt.execute();
-			conn.commit();
+			con.commit();
+			
+			stmt.close();
 			
 		} catch (SQLException e) {
-			if (conn != null) {
-				try {
-					conn.rollback();
-				} catch (SQLException e1) {
-					System.out.println("Erro no método cadastrarAluno - rollback");
-				}
-			}
-			System.out.println("Erro no método cadastrarAluno");
-			e.printStackTrace();
-		} finally {
-			db.finalizaObjetos(rs, stmt, conn);
+			throw new RuntimeException(e);
 		}
 	}
 	
 	public Aluno consultarPorMatricula(Long matricula){
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
+		String sql = "SELECT nome, cpf, sexo, datanascimento, endereço, curso, telefone, email "
+				+ "FROM alunos WHERE ativo = 1 AND matricula = ? "
+				+ "ORDER BY matricula ASC";
 		
 		Aluno aluno = new Aluno();
 		
 		try {
-			conn = db.obterConexao();
-
-			String sql = "SELECT nome, cpf, sexo, datanascimento, endereço, curso, telefone, email FROM alunos WHERE ativo = 1 AND matricula = ? ORDER BY matricula ASC";
-
-			stmt = conn.prepareStatement(sql.toString());
+			PreparedStatement stmt = con.prepareStatement(sql.toString());
 			
 			stmt.setLong(1, matricula);
 			
-			rs = stmt.executeQuery();
+			ResultSet rs = stmt.executeQuery();
 	
 			if (rs.next()) {
 				
@@ -98,18 +83,17 @@ public class AlunoDAO {
 				aluno.setCpf(rs.getString(2));
 				aluno.setSexo(sexo);
 				aluno.setDataNascimento(new Date(rs.getTimestamp("datanascimento").getTime()));
-				aluno.setEndereço(rs.getString(5));
+				aluno.setEndereco(rs.getString(5));
 				aluno.setCurso(rs.getString(6));
 				aluno.setTelefone(rs.getString(7));
 				aluno.setEmail(rs.getString(8));
 
 			}
+			
+			stmt.close();
 
 		} catch (SQLException e) {
-			System.out.println("Erro no método consultarPorMatricula");
-			e.printStackTrace();
-		} finally {
-			db.finalizaObjetos(rs, stmt, conn);
+			throw new RuntimeException(e);
 		}
 		return aluno;
 	}
@@ -117,19 +101,15 @@ public class AlunoDAO {
 	public ArrayList<Aluno> consultarListaAluno() {
 
 		ArrayList<Aluno> listaAluno = new ArrayList<Aluno>();
-
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
+		
+		String sql = "SELECT matricula, nome, cpf, sexo, datanascimento, endereço, curso, telefone, email "
+				+ "FROM alunos WHERE ativo = 1 "
+				+ "ORDER BY matricula ASC";
 
 		try {
-			conn = db.obterConexao();
+			PreparedStatement stmt = con.prepareStatement(sql.toString());
 
-			String sql = "SELECT matricula, nome, cpf, sexo, datanascimento, endereço, curso, telefone, email FROM alunos WHERE ativo = 1 ORDER BY matricula ASC";
-
-			stmt = conn.prepareStatement(sql.toString());
-
-			rs = stmt.executeQuery();
+			ResultSet rs = stmt.executeQuery();
 			
 			while (rs.next()) {
 				Aluno aluno = new Aluno();
@@ -140,38 +120,32 @@ public class AlunoDAO {
 				aluno.setCpf(rs.getString(3));
 				aluno.setSexo(sexo);
 				aluno.setDataNascimento(new Date(rs.getTimestamp("datanascimento").getTime()));
-				aluno.setEndereço(rs.getString(6));
+				aluno.setEndereco(rs.getString(6));
 				aluno.setCurso(rs.getString(7));
 				aluno.setTelefone(rs.getString(8));
 				aluno.setEmail(rs.getString(9));
 				
 				listaAluno.add(aluno);
 			}
+			
+			stmt.close();
 
 		} catch (SQLException e) {
-			System.out.println("Erro no método consultarAluno");
-			e.printStackTrace();
-		} finally {
-			db.finalizaObjetos(rs, stmt, conn);
+			throw new RuntimeException(e);
 		}
 		return listaAluno;
 	}
 	
 	public void alterarAluno(Aluno aluno) {
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
+		StringBuffer sql = new StringBuffer();
+		
+		sql.append("UPDATE alunos SET nome = ?, cpf = ?, sexo = ?, datanascimento = ?, endereço = ?, curso = ?, telefone = ?, email = ?");
+		sql.append("WHERE matricula = ?;");
 
 		try {
-			conn = db.obterConexao();
-			conn.setAutoCommit(false);
+			con.setAutoCommit(false);
 
-			StringBuffer sql = new StringBuffer();
-			
-			sql.append("UPDATE alunos SET nome = ?, cpf = ?, sexo = ?, datanascimento = ?, endereço = ?, curso = ?, telefone = ?, email = ?");
-			sql.append("WHERE matricula = ?;");
-
-			stmt = conn.prepareStatement(sql.toString());
+			PreparedStatement stmt = con.prepareStatement(sql.toString());
 			
 			String sexo = ""; if (aluno.getSexo() == 'M'){ sexo = "Masculino"; } else {	sexo = "Feminino";}
 			java.sql.Date d = new java.sql.Date(aluno.getDataNascimento().getTime());
@@ -180,64 +154,43 @@ public class AlunoDAO {
 			stmt.setString(2, String.valueOf(aluno.getCpf()));
 			stmt.setString(3, String.valueOf(sexo));
 			stmt.setDate(4, d);
-			stmt.setString(5, String.valueOf(aluno.getEndereço()));
+			stmt.setString(5, String.valueOf(aluno.getEndereco()));
 			stmt.setString(6, String.valueOf(aluno.getCurso()));
 			stmt.setString(7, String.valueOf(aluno.getTelefone()));
 			stmt.setString(8, String.valueOf(aluno.getEmail()));
 			stmt.setLong(9, Long.valueOf(aluno.getMatricula()));
 			
 			stmt.execute();
-			conn.commit();
+			con.commit();
+			
+			stmt.close();
 			
 		} catch (SQLException e) {
-			if (conn != null) {
-				try {
-					conn.rollback();
-				} catch (SQLException e1) {
-					System.out.println("Erro no método alterarAluno - rollback");
-				}
-			}
-			System.out.println("Erro no método alterarAluno");
-			e.printStackTrace();
-		} finally {
-			db.finalizaObjetos(rs, stmt, conn);
+			throw new RuntimeException(e);
 		}
 	}	
 	
 	public void inativarAluno(Long matricula) {
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-
+		StringBuffer sql = new StringBuffer();
+		
+		sql.append("UPDATE alunos SET ativo = ? ");
+		sql.append("WHERE matricula = ?;");
+		
 		try {
-			conn = db.obterConexao();
-			conn.setAutoCommit(false);
-
-			StringBuffer sql = new StringBuffer();
+			con.setAutoCommit(false);
 			
-			sql.append("UPDATE alunos SET ativo = ? ");
-			sql.append("WHERE matricula = ?;");
-
-			stmt = conn.prepareStatement(sql.toString());
+			PreparedStatement stmt = con.prepareStatement(sql.toString());
 			
 			stmt.setInt(1, 0);
 			stmt.setLong(2, matricula);
 			
 			stmt.execute();
-			conn.commit();
+			con.commit();
+			
+			stmt.close();
 			
 		} catch (SQLException e) {
-			if (conn != null) {
-				try {
-					conn.rollback();
-				} catch (SQLException e1) {
-					System.out.println("Erro no método inativarAluno - rollback");
-				}
-			}
-			System.out.println("Erro no método inativarAluno");
-			e.printStackTrace();
-		} finally {
-			db.finalizaObjetos(rs, stmt, conn);
+			throw new RuntimeException(e);
 		}
 	}	
 }

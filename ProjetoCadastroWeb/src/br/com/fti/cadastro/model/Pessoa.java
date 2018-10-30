@@ -27,7 +27,7 @@ public class Pessoa {
 	
 	@NotNull
 	@Size(max=255, message="Endereço não pode possuir mais de 255 caracteres")
-	private String endereço;
+	private String endereco;
 	
 	@NotNull
 	@Size(min=7, max=15, message="Número de telefone inválido")
@@ -68,12 +68,12 @@ public class Pessoa {
 		this.sexo = sexo;
 	}
 
-	public String getEndereço() {
-		return endereço;
+	public String getEndereco() {
+		return endereco;
 	}
 
-	public void setEndereço(String endereço) {
-		this.endereço = endereço;
+	public void setEndereco(String endereço) {
+		this.endereco = endereço;
 	}
 
 	public String getTelefone() {
