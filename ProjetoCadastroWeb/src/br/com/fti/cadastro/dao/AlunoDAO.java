@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 
 import org.springframework.stereotype.Repository;
 
+import br.com.fti.cadastro.controller.UtilController;
 import br.com.fti.cadastro.model.Aluno;
 
 @Repository
@@ -76,7 +77,7 @@ public class AlunoDAO {
 	
 			if (rs.next()) {
 				
-				char sexo = '0'; if (rs.getString(4).equals("Masculino")) {sexo = 'M';} else {sexo = 'F';}
+				char sexo = '0'; if (rs.getString(3).equals("M")) {sexo = 'M';} else {sexo = 'F';}
 				
 				aluno.setMatricula(matricula);
 				aluno.setNome(rs.getString(1));
@@ -113,7 +114,7 @@ public class AlunoDAO {
 			
 			while (rs.next()) {
 				Aluno aluno = new Aluno();
-				char sexo = '0'; if (rs.getString(4).equals("Masculino")) {sexo = 'M';} else {sexo = 'F';}
+				char sexo = '0'; if (rs.getString(4).equals("M")) {sexo = 'M';} else {sexo = 'F';}
 				
 				aluno.setMatricula(rs.getLong(1));
 				aluno.setNome(rs.getString(2));

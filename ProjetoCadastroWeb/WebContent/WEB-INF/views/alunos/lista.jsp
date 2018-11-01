@@ -31,7 +31,7 @@
 				<tfoot>
 					<tr>
 						<th colspan="6">
-							<input class="button" type="button" onclick="location.href=''" value="Cadastrar novo Aluno">
+							<input class="button" type="button" onclick="location.href='cadastrarAluno'" value="Cadastrar novo Aluno">
 						</th>
 					</tr>
 				</tfoot>
@@ -43,14 +43,22 @@
 							<td>${aluno.cpf}</td>
 							<td><fmt:formatDate
 									value="${aluno.dataNascimento}"
-									pattern="dd/MM/yyyy"/></td>
-							<td>${aluno.sexo}</td>
+									pattern="dd/MM/yyyy"/>
+							</td>
+							
+								<c:if test="${aluno.sexo == 'M'.charAt(0)}">
+								<td>Masculino</td>
+								</c:if>
+								<c:if test="${aluno.sexo == 'F'.charAt(0)}">
+								<td>Feminino</td>
+								</c:if>
+							
 							<td>${aluno.endereco}</td>
 							<td>${aluno.curso}</td>
 							<td>${aluno.telefone}</td>
 							<td>${aluno.email}</td>
-							<td style="display: flex-box; flex-orientation: row; width: 100%;"><a href="mostraAluno?matricula=${aluno.matricula}"><i style="color: white; margin-left:2%;" class="material-icons">create</i></a> &nbsp
-							<a href="removeTarefa?id=${aluno.matricula}"><i style="color: white;" class="material-icons">delete</i></a></td>
+							<td style="display: flex-box; flex-orientation: row; width: 100%;"><a href="mostraAluno?matricula=${aluno.matricula}"><i style="color: black; margin-left:2%;" class="material-icons">create</i></a> &nbsp
+							<a href="removeTarefa?id=${aluno.matricula}"><i style="color: black;" class="material-icons">delete</i></a></td>
 						</tr>
 					</c:forEach>
 				</tbody>

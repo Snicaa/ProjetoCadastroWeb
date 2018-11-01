@@ -1,6 +1,11 @@
 package br.com.fti.cadastro.controller;
 
+import java.text.SimpleDateFormat;
+
 public class UtilController {
+	
+	public static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+	
 	public static boolean validaCpf(String cpf){
 		boolean verifica = false;
 		if (cpf.length() == 11) {

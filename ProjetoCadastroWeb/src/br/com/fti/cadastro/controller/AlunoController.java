@@ -24,7 +24,13 @@ public class AlunoController {
 	}
 	
 	@RequestMapping("cadastrarAluno")
-	public String form() {
+	public String form(Model model) {
+		Aluno aluno = new Aluno();	
+		
+		aluno.setMatricula((long)0);
+		
+		model.addAttribute("aluno", aluno);
+		
 		return "alunos/formulario";
 	}
 	
@@ -34,18 +40,21 @@ public class AlunoController {
 		model.addAttribute("aluno", aluno);
 		
 		if(result.hasFieldErrors()){
+			System.out.println("ALGUM CAMPO INVÁLIDO");
 			return"alunos/formulario";
 		}
 		
 		if(!UtilController.validaCpf(aluno.getCpf())){
+			System.out.println("DEU ERRO NO CPF");
 			return "alunos/formulario";
 		}
 		
 		if(aluno.getMatricula() > 0){
-			return "redirect:alteraAluno";
+			dao.alterarAluno(aluno);
+			return "alunos/listaAlunos";
 		}
 		dao.cadastrarAluno(aluno);
-		return "alunos/cadastrado";
+		return "alunos/lista";
 	}
 	
 	@RequestMapping("listaAlunos")
@@ -73,6 +82,6 @@ public class AlunoController {
 	@RequestMapping("alteraAluno")
 	public String altera(Aluno aluno) {
 		dao.alterarAluno(aluno);
-		return "redirect:listaAlunos";
+		return "alunos/listaAlunos";
 	}
 }

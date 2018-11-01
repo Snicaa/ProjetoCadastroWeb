@@ -14,63 +14,78 @@
 	<main>
 	<body>
 		<div>
-			<fmt:formatDate value="${aluno.dataNascimento}"  
-               	type="date" 
+		<fmt:formatDate value="${aluno.dataNascimento}"  	
                 pattern="yyyy-MM-dd"
                 var="dataFormatada" />
 			<form:errors path="*" cssStyle="color:red"/>
-				<form action="alunoCadastrado" method="post">
-					<input type="hidden" value="${aluno.matricula}">
-					Nome:<input type="text" pattern="[A-Za-z]" min-length="2" name="nome" placeholder="" required value="${aluno.nome}" /><br/>
-					CPF:<input class="cpf" type="text" min-length="11" name="cpf" value="${aluno.cpf}" required><br/>
-					Data de Nascimento: <input type="date" name="dataNascimento" value='${dataFormatada}' pattern="dd-MM-yyyy" required/><br/>
-					Sexo: <input type="radio" name="sexo" value="M"> Masculino   &nbsp <input type="radio" name="sexo" value="F"> Feminino<br>
-					Endereço: <textarea min-length="10" name="endereço" required placeholder="Avenida Ayrton Senna, 500\nLondrina - PR"></textarea><br/>
-					Curso:
+				<form id="formAluno" name="alunoCadastro" action="alunoCadastrado" method="post">
+					<input type="hidden" name ="matricula" value="${aluno.matricula}"/>
+					<label for ="nome">Nome:</label>
+					<input type="text" min-length="2" name="nome" placeholder="" required value="${aluno.nome}" />
+					<span class="validacao"></span><br/>
+					
+					<label for="cpf">CPF:</label>
+					<input class="cpf" type="text" min-length="11" name="cpf" value="${aluno.cpf}" required>
+					<span class="validacao"></span><br/>
+					
+					<label for="dataNascimento">Data de Nascimento:</label>
+					<input type="text" name="dataNascimento" value="<fmt:formatDate value='${aluno.dataNascimento}'/>" required pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}">
+					<!-- <input type="date" name="dataNascimento" value='${dataFormatada}' required pattern="[0-9]{2}-[0-9]{2}-[0-9]{4}">-->
+					<span class="validacao"></span><br/>
+					Sexo:
+					<input type="radio" name="sexo" value="M" <c:if test="${aluno.sexo eq 'M'.charAt(0)}">checked</c:if><c:if test="${empty aluno.sexo}">checked</c:if>> Masculino  &nbsp
+					<input type="radio" name="sexo" value="F" <c:if test="${aluno.sexo eq 'F'.charAt(0)}">checked</c:if>> Feminino
+					<span class="validacao"></span><br/>
+					
+					<label for="endereco">Endereço:</label>
+					<textarea min-length="10" name="endereco" value="${aluno.endereco}" spellcheck="false" required placeholder="Avenida Ayrton Senna, 500 - Londrina, PR"></textarea>
+					<span class="validacao"></span><br/><br/>
+					<label for="curso">Curso:</label>
 					<select name="curso" required>
-					  	<option value="" disabled hidden>Selecionar...</option>
+					
+					  	<option value="" disabled hidden 
+					  	<c:if test='${empty aluno.curso }'>selected</c:if>
+					  	>Selecionar...</option>
+					  	
 						<option value="Java WEB" 
 						<c:if test='${aluno.curso eq "Java WEB"}'>selected</c:if>
 						>Java WEB</option>
+							
 						<option value="Cobol"
-						<c:if test='${aluno.curso eq "Java WEB"}'>selected</c:if>
+						<c:if test='${aluno.curso eq "Cobol"}'>selected</c:if>
 						>Cobol</option>
+						
 						<option value=".NET"
-						<c:if test='${aluno.curso eq "Java WEB"}'>selected</c:if>
+						<c:if test='${aluno.curso eq ".NET"}'>selected</c:if>
 						>.NET</option>
+						
 						<option value="Redes"
-						<c:if test='${aluno.curso eq "Java WEB"}'>selected</c:if>
+						<c:if test='${aluno.curso eq "Redes"}'>selected</c:if>
 						>Redes</option>
+						
 						<option value="Python"
-						<c:if test='${aluno.curso eq "Java WEB"}'>selected</c:if>
+						<c:if test='${aluno.curso eq "Python"}'>selected</c:if>
 						>Python</option>
-					</select><br/>
-					Telefone: <input type="text" name="telefone" value="${aluno.telefone}" required placeholder=""><br/>
-					E-mail: <input type="email" name="email" value="${aluno.email}" placeholder="exemplo: nome@gmail.com" required>
+						
+					</select>
+					<span class="validacao"></span><br/>
+					
+					<label for="telefone">Telefone:</label>
+					<input type="text" name="telefone" value="${aluno.telefone}" required placeholder="">
+					<span class="validacao"></span><br/>
+					
+					<label for="email" >E-mail:</label>
+					<input type="email" name="email" value="${aluno.email}" placeholder="exemplo: nome@gmail.com" required>
+					<span class="validacao"></span>
+					
 				 	<input id="adicionar" class="button" type="submit" value="${aluno.matricula gt 0 ? 'Alterar' : 'Cadastrar'}"/>
 				
-					<!--
-					<textarea class="txt" placeholder="Informe a descrição da tarefa aqui." minlength="5"	 name="descricao" rows="10" cols="50" style="border: 1px solid black; overflow:auto; outline: none;"></textarea><br />
 					<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 					<script>
-							$(".txt").on("input", function(){
-			                    var string = $(".txt").val();
-								if (string.length < 5){
-			                        if (string.length == 0){
-			                            $(".txt").css("border", "1px black solid");
-			                        } else {
-			                            $(".txt").css("border", "1px red solid");
-			                            $(".button").attr("disabled", "disabled");
-			                        }
-			                    } else {
-			                        $(".txt").css("border", "1px green solid");
-			                        $(".button").removeAttr("disabled");
-			                    }
-							});
-						</script>
-						-->
-					</form>
-				</div>
+						
+					</script>
+				</form>
+			</div>
 		</body>
 	</main>
 </html>
