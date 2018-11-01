@@ -43,7 +43,7 @@ public class AlunoDAO {
 			
 			stmt.setString(1, String.valueOf(aluno.getNome()));
 			stmt.setString(2, String.valueOf(aluno.getCpf()));
-			stmt.setString(3, "" + aluno.getSexo());
+			stmt.setString(3, aluno.getSexo());
 			stmt.setDate(4, d);
 			stmt.setString(5, String.valueOf(aluno.getEndereco()));
 			stmt.setString(6, String.valueOf(aluno.getCurso()));
@@ -75,15 +75,12 @@ public class AlunoDAO {
 			
 			ResultSet rs = stmt.executeQuery();
 	
-			if (rs.next()) {
-				
-				char sexo = '0'; if (rs.getString(3).equals("M")) {sexo = 'M';} else {sexo = 'F';}
-				
+			if (rs.next()) {				
 				aluno.setMatricula(matricula);
 				aluno.setNome(rs.getString(1));
 				aluno.setCpf(rs.getString(2));
-				aluno.setSexo(sexo);
-				aluno.setDataNascimento(new Date(rs.getTimestamp("datanascimento").getTime()));
+				aluno.setSexo(rs.getString(3));
+				aluno.setDataNascimento(UtilController.sdf.format(new Date(rs.getTimestamp("datanascimento").getTime())));
 				aluno.setEndereco(rs.getString(5));
 				aluno.setCurso(rs.getString(6));
 				aluno.setTelefone(rs.getString(7));
@@ -114,13 +111,12 @@ public class AlunoDAO {
 			
 			while (rs.next()) {
 				Aluno aluno = new Aluno();
-				char sexo = '0'; if (rs.getString(4).equals("M")) {sexo = 'M';} else {sexo = 'F';}
 				
 				aluno.setMatricula(rs.getLong(1));
 				aluno.setNome(rs.getString(2));
 				aluno.setCpf(rs.getString(3));
-				aluno.setSexo(sexo);
-				aluno.setDataNascimento(new Date(rs.getTimestamp("datanascimento").getTime()));
+				aluno.setSexo(rs.getString(3));
+				aluno.setDataNascimento(UtilController.sdf.format(new Date(rs.getTimestamp("datanascimento").getTime())));
 				aluno.setEndereco(rs.getString(6));
 				aluno.setCurso(rs.getString(7));
 				aluno.setTelefone(rs.getString(8));
@@ -148,12 +144,11 @@ public class AlunoDAO {
 
 			PreparedStatement stmt = con.prepareStatement(sql.toString());
 			
-			String sexo = ""; if (aluno.getSexo() == 'M'){ sexo = "Masculino"; } else {	sexo = "Feminino";}
 			java.sql.Date d = new java.sql.Date(aluno.getDataNascimento().getTime());
 			
 			stmt.setString(1, String.valueOf(aluno.getNome()));
 			stmt.setString(2, String.valueOf(aluno.getCpf()));
-			stmt.setString(3, String.valueOf(sexo));
+			stmt.setString(3, String.valueOf(aluno.getSexo()));
 			stmt.setDate(4, d);
 			stmt.setString(5, String.valueOf(aluno.getEndereco()));
 			stmt.setString(6, String.valueOf(aluno.getCurso()));

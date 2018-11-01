@@ -11,7 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class AlunoController {
@@ -34,15 +37,26 @@ public class AlunoController {
 		return "alunos/formulario";
 	}
 	
+	@RequestMapping("validaCpf")
+	public @ResponseBody String cpf(String cpf){
+		if(UtilController.validaCpf(cpf)){
+			return "";
+		}
+		return "CPF inválido";
+	}
+	
 	@RequestMapping("alunoCadastrado")
 	public String adiciona(@Valid Aluno aluno, BindingResult result, Model model) {
 		
 		model.addAttribute("aluno", aluno);
 		
 		if(result.hasFieldErrors()){
+			System.out.println(aluno.getCpf() + "   " + aluno.getDataNascimento() + "  " + aluno.getSexo());
 			System.out.println("ALGUM CAMPO INVÁLIDO");
 			return"alunos/formulario";
 		}
+		
+		System.out.println(aluno.getCpf());
 		
 		if(!UtilController.validaCpf(aluno.getCpf())){
 			System.out.println("DEU ERRO NO CPF");

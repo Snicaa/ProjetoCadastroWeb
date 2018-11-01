@@ -14,15 +14,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.sun.istack.internal.NotNull;
 
+import br.com.fti.cadastro.controller.UtilController;
+
 public class Pessoa {
 	
 	@NotNull
 	@Size(min=2, max=50, message = "Campo nome deve ser preenchido (2 a 50 caracteres")
 	private String nome;
-	
-	@NotNull
-	@Digits(integer=11, fraction=0)
-	@Size(min=11, message = "Campo CPF deve estar preenchido")
+
 	private String cpf;
 	
 	//@Pattern(message="Data inválida", regexp="^([0-2][0-9]|(3)[0-1])(\\/)(((0)[0-9])|((1)[0-2]))(\\/)\\d{4}$")
@@ -33,15 +32,14 @@ public class Pessoa {
 	//private Date dataNascimento;
 	
 	@NotNull
-	private char sexo;	
+	private String sexo;	
 	
 	@NotNull
 	@Size(max=255, message="Endereço não pode possuir mais de 255 caracteres")
 	private String endereco;
 	
 	@NotNull
-	@Digits(integer=15, fraction=0)
-	@Size(min=7, max=15, message="Número de telefone inválido")
+	@Size(min=2, max=20, message="Número de telefone inválido")
 	private String telefone;
 	
 	@Size(max=35, message = "E-mail muito longo")
@@ -61,7 +59,21 @@ public class Pessoa {
 	}
 
 	public void setCpf(String cpf) {
+		if (cpf.contains(".")) {
+			cpf = UtilController.removeMascaraCpf(cpf);
+		}
 		this.cpf = cpf;
+	}
+	
+	public void setCpfFormatado(String cpf) {
+		if (cpf.contains(".")) {
+			cpf = UtilController.removeMascaraCpf(getCpf());
+		}
+		this.cpf = cpf;
+	}
+	
+	public String getCpfFormatado(){
+		return UtilController.mascaraCpf(getCpf());
 	}
 	
 	public Date getDataNascimento() {
@@ -69,14 +81,12 @@ public class Pessoa {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		return sdf.parse(dataNascimento);
 		} catch (Exception e) {
-			System.out.println("DEU ERRO AQUI");
 			return null;
 		}
 	}
 
-	public void setDataNascimento(Date dataNascimento) {
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-		this.dataNascimento = sdf.format(dataNascimento);
+	public void setDataNascimento(String Str) {
+		this.dataNascimento = Str;
 	}
 
 //	public Date getDataNascimento() {
@@ -94,11 +104,11 @@ public class Pessoa {
 //		this.dataNascimentoStr = sdf.format(dataNascimentoStr);
 //	}
 
-	public char getSexo() {
+	public String getSexo() {
 		return sexo;
 	}
 
-	public void setSexo(char sexo) {
+	public void setSexo(String sexo) {
 		this.sexo = sexo;
 	}
 

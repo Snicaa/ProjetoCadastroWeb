@@ -14,31 +14,33 @@
 	<main>
 	<body>
 		<div>
-		<fmt:formatDate value="${aluno.dataNascimento}"  	
-                pattern="yyyy-MM-dd"
-                var="dataFormatada" />
 			<form:errors path="*" cssStyle="color:red"/>
 				<form id="formAluno" name="alunoCadastro" action="alunoCadastrado" method="post">
 					<input type="hidden" name ="matricula" value="${aluno.matricula}"/>
-					<label for ="nome">Nome:</label>
-					<input type="text" min-length="2" name="nome" placeholder="" required value="${aluno.nome}" />
-					<span class="validacao"></span><br/>
 					
-					<label for="cpf">CPF:</label>
-					<input class="cpf" type="text" min-length="11" name="cpf" value="${aluno.cpf}" required>
-					<span class="validacao"></span><br/>
+					<div class="campo">
+						<label for ="nome">Nome:</label>
+						<input id="campoNome" type="text" min-length="5" name="nome" placeholder="" required value="${aluno.nome}" />
+						<span class="validacao"></span><br/>
+					</div>
+					
+					<div class="campo">
+						<label for="cpf">CPF:</label>
+						<input id="campoCpf" class="cpf" type="text" name="cpf" value="${aluno.cpfFormatado}" required>
+						<span class="validacao"></span><br/>
+					</div>
 					
 					<label for="dataNascimento">Data de Nascimento:</label>
-					<input type="text" name="dataNascimento" value="<fmt:formatDate value='${aluno.dataNascimento}'/>" required pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}">
+					<input id="campoData" type="text" name="dataNascimento" value="<fmt:formatDate value='${aluno.dataNascimento}'/>" required pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}">
 					<!-- <input type="date" name="dataNascimento" value='${dataFormatada}' required pattern="[0-9]{2}-[0-9]{2}-[0-9]{4}">-->
 					<span class="validacao"></span><br/>
 					Sexo:
-					<input type="radio" name="sexo" value="M" <c:if test="${aluno.sexo eq 'M'.charAt(0)}">checked</c:if><c:if test="${empty aluno.sexo}">checked</c:if>> Masculino  &nbsp
-					<input type="radio" name="sexo" value="F" <c:if test="${aluno.sexo eq 'F'.charAt(0)}">checked</c:if>> Feminino
+					<input type="radio" name="sexo" value="M" <c:if test="${aluno.sexo eq 'M'}">checked</c:if><c:if test="${empty aluno.sexo}">checked</c:if>> Masculino  &nbsp
+					<input type="radio" name="sexo" value="F" <c:if test="${aluno.sexo eq 'F'}">checked</c:if>> Feminino
 					<span class="validacao"></span><br/>
 					
 					<label for="endereco">Endereço:</label>
-					<textarea min-length="10" name="endereco" value="${aluno.endereco}" spellcheck="false" required placeholder="Avenida Ayrton Senna, 500 - Londrina, PR"></textarea>
+					<textarea min-length="10" name="endereco" value="${aluno.endereco}" spellcheck="false" required placeholder="Avenida Ayrton Senna, 500 - Londrina, PR">${aluno.endereco}</textarea>
 					<span class="validacao"></span><br/><br/>
 					<label for="curso">Curso:</label>
 					<select name="curso" required>
@@ -71,21 +73,45 @@
 					<span class="validacao"></span><br/>
 					
 					<label for="telefone">Telefone:</label>
-					<input type="text" name="telefone" value="${aluno.telefone}" required placeholder="">
+					<input id="campoTelefone" type="text" name="telefone" value="${aluno.telefone}" required placeholder="">
 					<span class="validacao"></span><br/>
 					
-					<label for="email" >E-mail:</label>
-					<input type="email" name="email" value="${aluno.email}" placeholder="exemplo: nome@gmail.com" required>
-					<span class="validacao"></span>
+					<div class="campo">
+						<label for="email" >E-mail:</label>
+						<input id="campoEmail" type="email" name="email" value="${aluno.email}" placeholder="exemplo: nome@gmail.com" required>
+						<span class="validacao"></span>
+					</div>
 					
 				 	<input id="adicionar" class="button" type="submit" value="${aluno.matricula gt 0 ? 'Alterar' : 'Cadastrar'}"/>
-				
-					<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-					<script>
-						
-					</script>
 				</form>
 			</div>
 		</body>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.0/jquery.mask.js"></script>
+		
+		<script>
+		$(document).ready(function () { 
+			
+	        $("#campoCpf").mask('000.000.000-00', {reverse: true});
+	        $('#campoData').mask('00/00/0000');
+	       // $('#campoTelefone').mask('(00) 0000-0000');
+	    });
+		
+		$("#campoNome").blur(function(){
+			if($(this).val().length < 5 || $(this).val().length > 30){
+				$(this).closest(".campo").find(".validacao").html("Nome inválido (5 à 50 caracteres)");
+				alert("oi");	
+			}
+		});
+		
+		$("#campoCpf").blur(function(){
+			var cpf = $('#campoCpf').val().replace(/[^0-9]/g, '').toString();
+			$.post("confereCpf?cpf=" + cpf, function(resposta){
+				if (resposta != ("")){
+					$("#campoCpf").closest(".campo").find(".validacao").html("CPF inválido");
+				}
+			})
+		});
+		</script>
 	</main>
 </html>

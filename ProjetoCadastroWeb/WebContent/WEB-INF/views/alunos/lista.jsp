@@ -40,7 +40,7 @@
 						<tr id="aluno_${aluno.matricula}">
 							<td>${aluno.matricula}</td>
 							<td>${aluno.nome}</td>
-							<td>${aluno.cpf}</td>
+							<td>${aluno.cpfFormatado}</td>
 							<td><fmt:formatDate
 									value="${aluno.dataNascimento}"
 									pattern="dd/MM/yyyy"/>
