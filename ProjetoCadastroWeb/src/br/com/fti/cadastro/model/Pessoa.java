@@ -89,21 +89,6 @@ public class Pessoa {
 		this.dataNascimento = Str;
 	}
 
-//	public Date getDataNascimento() {
-//		try {
-//		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-//		return sdf.parse(getDataNascimentoStr());
-//		} catch (ParseException e) {
-//			System.out.println("DEU ERRO AQUI");
-//			return null;
-//		}
-//	}
-//
-//	public void setDataNascimento(Date dataNascimento) {
-//		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-//		this.dataNascimentoStr = sdf.format(dataNascimentoStr);
-//	}
-
 	public String getSexo() {
 		return sexo;
 	}
@@ -119,12 +104,19 @@ public class Pessoa {
 	public void setEndereco(String endereco) {
 		this.endereco = endereco;
 	}
-
+	
+	public String getTelefoneFormatado(){
+		return UtilController.mascaraTelefone(telefone);
+	}
+	
 	public String getTelefone() {
 		return telefone;
 	}
 
 	public void setTelefone(String telefone) {
+		if (telefone.contains(")")) {
+			telefone = UtilController.removeMascaraTelefone(telefone);
+		}
 		this.telefone = telefone;
 	}
 

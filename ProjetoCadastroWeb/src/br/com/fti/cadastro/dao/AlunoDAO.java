@@ -115,7 +115,7 @@ public class AlunoDAO {
 				aluno.setMatricula(rs.getLong(1));
 				aluno.setNome(rs.getString(2));
 				aluno.setCpf(rs.getString(3));
-				aluno.setSexo(rs.getString(3));
+				aluno.setSexo(rs.getString(4));
 				aluno.setDataNascimento(UtilController.sdf.format(new Date(rs.getTimestamp("datanascimento").getTime())));
 				aluno.setEndereco(rs.getString(6));
 				aluno.setCurso(rs.getString(7));

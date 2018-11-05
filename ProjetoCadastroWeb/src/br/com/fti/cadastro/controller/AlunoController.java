@@ -37,29 +37,18 @@ public class AlunoController {
 		return "alunos/formulario";
 	}
 	
-	@RequestMapping("validaCpf")
-	public @ResponseBody String cpf(String cpf){
-		if(UtilController.validaCpf(cpf)){
-			return "";
-		}
-		return "CPF inválido";
-	}
-	
 	@RequestMapping("alunoCadastrado")
 	public String adiciona(@Valid Aluno aluno, BindingResult result, Model model) {
 		
 		model.addAttribute("aluno", aluno);
 		
 		if(result.hasFieldErrors()){
-			System.out.println(aluno.getCpf() + "   " + aluno.getDataNascimento() + "  " + aluno.getSexo());
-			System.out.println("ALGUM CAMPO INVÁLIDO");
 			return"alunos/formulario";
 		}
 		
 		System.out.println(aluno.getCpf());
 		
 		if(!UtilController.validaCpf(aluno.getCpf())){
-			System.out.println("DEU ERRO NO CPF");
 			return "alunos/formulario";
 		}
 		

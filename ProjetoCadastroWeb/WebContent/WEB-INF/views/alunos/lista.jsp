@@ -46,18 +46,18 @@
 									pattern="dd/MM/yyyy"/>
 							</td>
 							
-								<c:if test="${aluno.sexo == 'M'.charAt(0)}">
+								<c:if test="${aluno.sexo == 'M'}">
 								<td>Masculino</td>
 								</c:if>
-								<c:if test="${aluno.sexo == 'F'.charAt(0)}">
+								<c:if test="${aluno.sexo == 'F'}">
 								<td>Feminino</td>
 								</c:if>
 							
 							<td>${aluno.endereco}</td>
 							<td>${aluno.curso}</td>
-							<td>${aluno.telefone}</td>
+							<td>${aluno.telefoneFormatado}</td>
 							<td>${aluno.email}</td>
-							<td style="display: flex-box; flex-orientation: row; width: 100%;"><a href="mostraAluno?matricula=${aluno.matricula}"><i style="color: black; margin-left:2%;" class="material-icons">create</i></a> &nbsp
+							<td style="display: flex-box; flex-orientation: row;"><a href="mostraAluno?matricula=${aluno.matricula}"><i style="color: black; margin-left:2%;" class="material-icons">create</i></a> &nbsp
 							<a href="removeTarefa?id=${aluno.matricula}"><i style="color: black;" class="material-icons">delete</i></a></td>
 						</tr>
 					</c:forEach>
@@ -66,11 +66,5 @@
 		</main>
 	</body>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<!-- <script type="text/javascript">
-		function finalizaAgora(id) {
-			$.post("finalizaTarefa", {'id' : id}, function(resposta) {
-				$("#tarefa_"+id).html(resposta);
-			});
-		}
-</script> -->
+
 </html>
