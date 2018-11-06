@@ -1,8 +1,10 @@
 package br.com.fti.cadastro.controller;
 
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +14,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class UtilController {
 	
 	public static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+	public static NumberFormat nF;
+	
+	@RequestMapping("/")
+	public String home(){
+		return "index";
+	}
 	
 	@RequestMapping("validaCpf")
 	public @ResponseBody String cpf(String cpf){
@@ -126,5 +134,11 @@ public class UtilController {
 	public static String removeMascaraTelefone(String telefone){
 		telefone = telefone.replaceAll("[()-]", "");
 		return telefone;
+	}
+	
+	public static String mascaraDinheiro(String dinheiro){
+		String[] valor = dinheiro.split(",");
+		dinheiro = "R$ " + valor[0] + "," + valor[1];
+		return dinheiro;
 	}
 }

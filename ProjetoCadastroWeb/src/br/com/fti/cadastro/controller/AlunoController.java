@@ -62,10 +62,7 @@ public class AlunoController {
 	
 	@RequestMapping("listaAlunos")
 	public String lista(Model model) {
-		
-		ArrayList<Aluno> arrayAlunos = dao.consultarListaAluno();
-		
-		model.addAttribute("alunos", arrayAlunos);
+		model.addAttribute("alunos", dao.consultarListaAluno());
 		
 		return "alunos/lista";
 	}

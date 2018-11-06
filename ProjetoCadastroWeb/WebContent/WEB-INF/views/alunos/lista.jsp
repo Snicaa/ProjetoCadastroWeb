@@ -30,8 +30,9 @@
 				</thead>
 				<tfoot>
 					<tr>
-						<th colspan="6">
+						<th colspan="10">
 							<input class="button" type="button" onclick="location.href='cadastrarAluno'" value="Cadastrar novo Aluno">
+							<a href="/ProjetoCadastroWeb/"><button>Menu</button></a>
 						</th>
 					</tr>
 				</tfoot>
