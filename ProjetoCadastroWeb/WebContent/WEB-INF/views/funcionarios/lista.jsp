@@ -60,54 +60,72 @@
 							<a href="removeTarefa?id=${funcionario.cadastro}"><i style="color: black;" class="material-icons">delete</i></a></td>
 						</tr>
 						<tr id="funcionario_${funcionario.cadastro}aux" class="auxTr">
-							<td colspan="10">
+							<td colspan="9">
 								<div class="divAuxInfo">
 									<table style="width: 100%;">
-									<tr>
-										<th>Salário</th>
-										<th>Vale Transporte</th>
-										<th>Vale Alimentação</th>
-										<th>Vale Refeição</th>
-										<th>Nº de Dependentes</th>
-										<c:if test="${funcionario.cargo eq 'Professor'}">
-										<th>Disciplina</th>
-										</c:if>
-									</tr>
-									<tr>
-										<td>${funcionario.salario}</td>
-										<td>${funcionario.valeTransporte}</td>
-										<td>${funcionario.valeAlimentacao}</td>
-										<td>${funcionario.valeRefeicao}</td>
-										<td>${funcionario.filhos}</td>
-										<c:if test="${funcionario.cargo eq 'Professor' }">
-										<td>${funcionario.disciplina}</td>
-										</c:if>
-									</tr>
-									
-									<c:if test="${funcionario.filhos gt 0}">
-										<tr></tr>
 										<tr>
-											<th colspan="5">Filhos</th>
+											<td> &nbsp</td>
 										</tr>
 										<tr>
-											<th></th>
-											<th colspan="2">Nome</th>
-											<th colspan="2">Data de Nascimento</th>
-											<th></th>
+											<th>Salário</th>
+											<th>Vale Transporte</th>
+											<th>Vale Alimentação</th>
+											<th>Vale Refeição</th>
+											<th>Nº de Dependentes</th>
+											<c:if test="${funcionario.cargo eq 'Professor'}">
+											<th>Disciplina</th>
+											</c:if>
 										</tr>
-										<c:set var="counter" value="1"/>
-										<c:forEach items="${funcionario.listaFilhos}" var="filho">
+										<tr>
+											<td>${funcionario.salarioFormatado}</td>
+											<td>${funcionario.valeTransporteFormatado}</td>
+											<td>${funcionario.valeAlimentacaoFormatado}</td>
+											<td>${funcionario.valeRefeicaoFormatado}</td>
+											<td>${funcionario.filhos}</td>
+											<c:if test="${funcionario.cargo eq 'Professor' }">
+											<td>${funcionario.disciplina}</td>
+											</c:if>
+										</tr>
+										
+										<c:if test="${funcionario.filhos gt 0}">
 											<tr>
-												<td style="text-align: right;">Filho ${counter}</td>
-												<td colspan="2" style="text-align: center;">${filho.nome}</td>
-												<td colspan="2" style="text-align: center;"><fmt:formatDate
-															value="${filho.dataNascimento}"
-															pattern="dd/MM/yyyy"/>
+												<td> &nbsp</td>
+											</tr>
+											<tr>
+												<c:if test="${funcionario.cargo == 'Professor'}">
+													<td colspan="6">
+												</c:if>
+												<c:if test="${funcionario.cargo != 'Professor'}">
+													<td colspan="5">
+												</c:if>
+													<div class="divTabelaFilhos">
+														<table style="width: 100%;">
+															<tr>
+																<th colspan="3">Filhos</th>
+															</tr>
+															<tr>
+																<th></th>
+																<th>Nome</th>
+																<th>Data de Nascimento</th>
+																<th></th>
+															</tr>
+															<c:set var="counter" value="1"/>
+															<c:forEach items="${funcionario.listaFilhos}" var="filho">
+																<tr>
+																	<td style="text-align: right;">Filho ${counter}</td>
+																	<td style="text-align: center;">${filho.nome}</td>
+																	<td style="text-align: center;"><fmt:formatDate
+																				value="${filho.dataNascimento}"
+																				pattern="dd/MM/yyyy"/>
+																	</td>
+																</tr>
+																	<c:set var="counter" value="${counter+1}"/>
+																</c:forEach>
+															</table>
+														</div>
 												</td>
 											</tr>
-											<c:set var="counter" value="${counter+1}"/>
-										</c:forEach> 
-									</c:if>
+										</c:if>
 									</table>
 								</div>
 							</td>
@@ -120,14 +138,14 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script>
 	$(function(){
-		$("td[colspan=10]").find(".divAuxInfo").hide();
+		$("td[colspan=9]").find(".divAuxInfo").hide();
 		
 		$(".tabelaMain").click(function(event){
 			event.stopPropagation();
 			
 			var $target = $(event.target);
 			
-			if($target.closest("div").closest("tr").find("td").attr("colspan") > 9) {
+			if($target.closest("div").closest("tr").find("td").attr("colspan") > 8) {
 				$target.closest("div").slideUp();
 			} else { 
 					$target.closest("tr").next().find(".divAuxInfo").slideToggle();

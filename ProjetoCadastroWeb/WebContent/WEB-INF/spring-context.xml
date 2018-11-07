@@ -12,8 +12,8 @@ http://www.springframework.org/schema/context
 http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
 	<context:component-scan base-package="br.com.fti.cadastro" />
-	<mvc:annotation-driven />
 	<mvc:default-servlet-handler/>
+	
 	<!--
 	<mvc:interceptors>
 		<bean class="br.com.cadastrofti.interceptor.AutorizadorInterceptor"/>
@@ -30,4 +30,5 @@ http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 			<property name="username" value="Tiago"/>
 			<property name="password" value="ftiago"/>
 	</bean>
+	<mvc:annotation-driven />
 </beans>

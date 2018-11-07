@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class UtilController {
 	
 	public static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-	public static NumberFormat nF;
+	public static NumberFormat nF = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 	
 	@RequestMapping("/")
 	public String home(){
@@ -136,9 +136,8 @@ public class UtilController {
 		return telefone;
 	}
 	
-	public static String mascaraDinheiro(String dinheiro){
-		String[] valor = dinheiro.split(",");
-		dinheiro = "R$ " + valor[0] + "," + valor[1];
+	public static String mascaraDinheiro(Double grana){
+		String dinheiro = UtilController.nF.format(grana);
 		return dinheiro;
 	}
 }
