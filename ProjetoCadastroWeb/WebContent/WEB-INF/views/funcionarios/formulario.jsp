@@ -8,6 +8,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 		<title>Cadastro FTI</title>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 		<!--  <link rel="stylesheet" type="text/css" href="css/style.css"> -->
 	</head>
 	<h1>Cadastrar Funcionário</h1>
@@ -127,7 +128,20 @@
 					<br>
 					<div class="campo">
 						<label for="filhos">Número de dependentes*:</label>
-						<input id="campoFilhos" name="filhos" value="${funcionario.fihos}" required><button id="addFilhos" disabled>Cadastrar Filhos</button>
+						<input id="campoFilhos" name="filhos" value="<c:if test='${not empty funcionario.fihos}'>${funcionario.filhos}</c:if><c:if test='${empty funcionario.fihos}'>0</c:if>" required> <button id="addFilhos">Adicionar Dependente</button>
+						
+						<div class="formularioFilho" hidden>	                        
+				            <div class="campo">
+				                <span id="spanFilho"></span><br>
+				                <label for="nomeFilho">Nome*:</label>
+				                <input type="text" name="nomeFilho" placeholder="Nome" />
+				                <label for="dataFilho">Data de Nascimento*:</label>
+				                <input type="text" name="dataFilho" placeholder="__/__/____" />
+								<span style="cursor: pointer;" class="hideThis spanExcluir" onclick="excluirLinha(this)" ><i style="color: black;" class="material-icons">delete</i></span>
+							</div>							
+	     				</div>
+	     				<div class="fim"></div>
+</div>
 					</div>
 					
 				 	<input id="adicionar" class="button" type="submit" value="${funcionario.cadastro gt 0 ? 'Alterar' : 'Cadastrar'}"/>
@@ -139,9 +153,12 @@
 		<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.0/jquery.mask.js"></script>
 		<script src="resources/js/jquery.maskMoney.js"></script>
-		<jsp:include page="divFilhos.jsp" />  
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/livequery/1.1.1/jquery.livequery.js"></script>
+
 		
-		<script>
+		<script type="text/javascript">
+		var numFilhosAntes = 0;
+		var flagBotao;
 		var nomeTemErro = true;
 		var cpfTemErro = true;
 		var dataTemErro = true;
@@ -169,7 +186,139 @@
 	        if($("#campoFilhos").val() > 0){
 	        	$("#addFilhos").removeAttr("disabled", "disabled");
 	        }
+	        
+	        $("#campoNome").blur(function(){
+				if($(this).val().length < 5 || $(this).val().length > 30){
+					$(this).closest(".campo").find(".validacao").html("Nome inválido (5 a 50 caracteres)");
+					nomeTemErro = true;
+				} else {
+					$(this).closest(".campo").find(".validacao").html("");
+					nomeTemErro = false;
+					$("#adicionar").attr("title", erros);
+				}
+			});
+			
+			$("#campoCpf").blur(function(){
+				var cpf = $('#campoCpf').val().replace(/[^0-9]/g, '').toString();
+				$.post("validaCpf?cpf=" + cpf, function(resposta){
+					$("#campoCpf").closest(".campo").find(".validacao").html(resposta);
+					if (resposta == ""){
+						cpfTemErro = false;
+						$("#adicionar").attr("title", erros);
+					} else {
+						cpfTemErro = true;
+					}
+				})
+			});
+			
+			$("#campoData").blur(function(){
+				$.post("validaData?data=" + $(this).val(), function(resposta){
+					$("#campoData").closest(".campo").find(".validacao").html(resposta);
+					if (resposta == ""){
+						dataTemErro = false;
+						$("#adicionar").attr("title", erros);
+					} else {
+						dataTemErro = true;
+					}
+				})
+			});
+			
+			$("#campoEndereco").blur(function(){
+				if($(this).val().length < 10 || $(this).val().length > 255){
+					$(this).closest(".campo").find(".validacao").html("Endereço inválido (10 a 255 caracteres)");
+					enderecoTemErro = true;
+				} else {
+					$(this).closest(".campo").find(".validacao").html("");
+					enderecoTemErro = false;
+					$("#adicionar").attr("title", erros);
+				}
+			});
+			
+			$("#campoCurso").blur(function(){
+				if($(this).val() == "Selecionar..."){
+					$(this).closest(".campo").find(".validacao").html("Selecione um curso");
+					cursoTemErro = true;
+				} else {
+					$(this).closest(".campo").find(".validacao").html("");
+					cursoTemErro = false;
+					$("#adicionar").attr("title", erros);
+				}
+			});
+			
+			$("#campoTelefone").blur(function(){
+				if ($(this).val().length < 10 || $(this).val().length > 15){
+					$(this).closest(".campo").find(".validacao").html("Telefone inválido");
+					telefoneTemErro = true;
+				} else {
+					$(this).closest(".campo").find(".validacao").html("");
+					telefoneTemErro = false;
+					$("#adicionar").attr("title", erros);
+				}
+			});
+			
+			$("#campoEmail").blur(function(){
+				if ($(this).val().length < 5 || $(this).val().length > 30 || !$(this).val().includes("@")){
+					$(this).closest(".campo").find(".validacao").html("E-mail inválido");
+					emailTemErro = true;
+				} else {
+					$(this).closest(".campo").find(".validacao").html("");
+					emailTemErro = false;
+					$("#adicionar").attr("title", erros);
+				}
+			});
+			
+			$("#campoFilhos").on("input", function(){
+				var valor = $(this).val();
+				if (valor > 0){
+					$(".formularioFilho").removeAttr("hidden", "hidden");
+				} else {
+					$(".formularioFilho").attr("hidden", "hidden");
+				}
+			});
+			
+			$("#addFilhos").click(function(){
+				
+				var numFilhos = $("#campoFilhos").val();
+				numFilhos = parseInt(numFilhos);
+				if (numFilhos == 0){
+					$(".formularioFilho").removeAttr("hidden", "hidden");
+					numFilhos = numFilhos + 1;
+					$("#campoFilhos").val(numFilhos);
+					
+				} else{ 
+					
+					numFilhos = numFilhos + 1;
+					$("#campoFilhos").val(numFilhos);
+					
+					var novaLinha = $(".formularioFilho").clone();
+
+					if($(novaLinha)[0].hasAttribute("hidden")){
+						novaLinha.removeAttr("hidden", "hidden");
+					}
+					
+					novaLinha.removeClass("formularioFilho").addClass("nova").find("input[name=nomeFilho]").focus();
+					
+					novaLinha.find(".hideThis").removeClass("hideThis");
+				
+					novaLinha.insertBefore(".fim");
+				}
+				
+				return false;
+				
+				}
+			);	
+			
+			$(".hideThis").click(function(){
+				$(".hideThis").closest(".formularioFilho").attr("hidden", "hidden");
+			});
+			
+			$(".spanExcluir").livequery("click", function(e){
+				alert('1');
+				excluirLinha($(this));
+			});
+			
 	    });
+		
 		
 		function erros(){
 			if (nomeTemErro || cpfTemErro || dataTemErro || enderecoTemErro|| cursoTemErro || telefoneTemErro || emailTemErro){
@@ -202,118 +351,25 @@
 			return stringErros;
 		}
 		
-		$("#campoNome").blur(function(){
-			if($(this).val().length < 5 || $(this).val().length > 30){
-				$(this).closest(".campo").find(".validacao").html("Nome inválido (5 a 50 caracteres)");
-				nomeTemErro = true;
-			} else {
-				$(this).closest(".campo").find(".validacao").html("");
-				nomeTemErro = false;
-				$("#adicionar").attr("title", erros);
-			}
-		});
-		
-		$("#campoCpf").blur(function(){
-			var cpf = $('#campoCpf').val().replace(/[^0-9]/g, '').toString();
-			$.post("validaCpf?cpf=" + cpf, function(resposta){
-				$("#campoCpf").closest(".campo").find(".validacao").html(resposta);
-				if (resposta == ""){
-					cpfTemErro = false;
-					$("#adicionar").attr("title", erros);
-				} else {
-					cpfTemErro = true;
-				}
-			})
-		});
-		
-		$("#campoData").blur(function(){
-			$.post("validaData?data=" + $(this).val(), function(resposta){
-				$("#campoData").closest(".campo").find(".validacao").html(resposta);
-				if (resposta == ""){
-					dataTemErro = false;
-					$("#adicionar").attr("title", erros);
-				} else {
-					dataTemErro = true;
-				}
-			})
-		});
-		
-		$("#campoEndereco").blur(function(){
-			if($(this).val().length < 10 || $(this).val().length > 255){
-				$(this).closest(".campo").find(".validacao").html("Endereço inválido (10 a 255 caracteres)");
-				enderecoTemErro = true;
-			} else {
-				$(this).closest(".campo").find(".validacao").html("");
-				enderecoTemErro = false;
-				$("#adicionar").attr("title", erros);
-			}
-		});
-		
-		$("#campoCurso").blur(function(){
-			if($(this).val() == "Selecionar..."){
-				$(this).closest(".campo").find(".validacao").html("Selecione um curso");
-				cursoTemErro = true;
-			} else {
-				$(this).closest(".campo").find(".validacao").html("");
-				cursoTemErro = false;
-				$("#adicionar").attr("title", erros);
-			}
-		});
-		
-		$("#campoTelefone").blur(function(){
-			if ($(this).val().length < 10 || $(this).val().length > 15){
-				$(this).closest(".campo").find(".validacao").html("Telefone inválido");
-				telefoneTemErro = true;
-			} else {
-				$(this).closest(".campo").find(".validacao").html("");
-				telefoneTemErro = false;
-				$("#adicionar").attr("title", erros);
-			}
-		});
-		
-		$("#campoEmail").blur(function(){
-			if ($(this).val().length < 5 || $(this).val().length > 30 || !$(this).val().includes("@")){
-				$(this).closest(".campo").find(".validacao").html("E-mail inválido");
-				emailTemErro = true;
-			} else {
-				$(this).closest(".campo").find(".validacao").html("");
-				emailTemErro = false;
-				$("#adicionar").attr("title", erros);
-			}
-		});
-		
-		$("#campoFilhos").on("input", function(){
-			var valor = $(this).val();
-			if (valor > 0){
-				$("#addFilhos").removeAttr("disabled", "disabled");
-			} else {
-				$("#addFilhos").attr("disabled", "disabled");
-			}
-		});
-		
-		$("#divCadastroFilhos").dialog({
-			autoOpen: false,
-			title: 'Cadastrar Filhos',
-			close: function(){
-				
-			}
-		});
-		$("#addFilhos").click(function(){
-			$("#divCadastroFilhos").find("#numeroFilhos").val($("#campoFilhos").val())
+		function loopFilhos(){
 			
-			var numFilhos = $("#numeroFilhos").val();
+			var numFilhos = $("#campoFilhos").val();
 			for(i = 1; i < numFilhos; i++){
-				var novaLinha = $(".modelo").clone();
-				novaLinha.removeClass("modelo").addClass("nova").find("input[name=txtModelo]").focus();
-				novaLinha.find(".linkExcluir").removeClass("hidden");
+				var novaLinha = $(".formularioFilhos").clone();
+				novaLinha.removeClass("modelo").addClass("nova").find("input[name=nomeFilho]").focus();
 				
 				novaLinha.insertBefore(".fim");
 			}
-			
-			$("#divCadastroFilhos").dialog('open');
-			return false;
-		});
+		}	
 		
+		function excluirLinha(elemento){
+			alert('excluirLinha');
+			var numFilhos = $("#campoFilhos").val();
+			numFilhos = parseInt(numFilhos);
+			$(elemento).closest(".nova").remove();
+			numFilhos = numFilhos - 1;
+			$("#campoFilhos").val(numFilhos);
+		}
 		
 		
 		</script>
