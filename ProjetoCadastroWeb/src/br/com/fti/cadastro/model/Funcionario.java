@@ -5,16 +5,17 @@ import java.util.ArrayList;
 import br.com.fti.cadastro.controller.UtilController;
 
 public class Funcionario extends Pessoa {
-	private String cadastro, cargo;
+	private Long cadastro;
+	private String cargo;
 	private double salario, valeAlimentacao, valeTransporte, valeRefeicao;
 	private int filhos;
 	private ArrayList<Pessoa> listaFilhos;
 	
-	public String getCadastro() {
+	public Long getCadastro() {
 		return cadastro;
 	}
 	
-	public void setCadastro(String cadastro) {
+	public void setCadastro(Long cadastro) {
 		this.cadastro = cadastro;
 	}
 	

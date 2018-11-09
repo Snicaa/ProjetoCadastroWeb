@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -31,33 +32,89 @@ public class FuncionarioDAO {
 		}
 	}
 	
-	public void cadastrarFuncionario(Aluno aluno) {
+	public void cadastrarFuncionario(Funcionario funcionario) {
 		
 		StringBuffer sql = new StringBuffer();
 		
-		sql.append("INSERT INTO alunos (nome, cpf, sexo, datanascimento, endereço, curso, telefone, email, ativo)");
-		sql.append("VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+		sql.append("INSERT INTO funcionarios (nome, cpf, sexo, datanascimento, endereço, cargo, disciplina, salario, vale_alimentacao, vale_refeicao, vale_transporte,"
+				+ " telefone, email, numero_filhos, ativo)");
+		sql.append("VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
 		try {
 			con.setAutoCommit(false);
 
 			PreparedStatement stmt = con.prepareStatement(sql.toString());	
 
-			java.sql.Date d = new java.sql.Date(aluno.getDataNascimento().getTime());
+			java.sql.Date d = new java.sql.Date(funcionario.getDataNascimento().getTime());
 			
-			stmt.setString(1, String.valueOf(aluno.getNome()));
-			stmt.setString(2, String.valueOf(aluno.getCpf()));
-			stmt.setString(3, aluno.getSexo());
+			stmt.setString(1, String.valueOf(funcionario.getNome()));
+			stmt.setString(2, String.valueOf(funcionario.getCpf()));
+			stmt.setString(3, String.valueOf(funcionario.getSexo()));
 			stmt.setDate(4, d);
-			stmt.setString(5, String.valueOf(aluno.getEndereco()));
-			stmt.setString(6, String.valueOf(aluno.getCurso()));
-			stmt.setString(7, String.valueOf(aluno.getTelefone()));
-			stmt.setString(8, String.valueOf(aluno.getEmail()));
-			stmt.setLong(9, 1);
+			stmt.setString(5, String.valueOf(funcionario.getEndereco()));
+			stmt.setString(6, String.valueOf(funcionario.getCargo()));
+			
+			if (funcionario instanceof Professor){
+				stmt.setString(7, String.valueOf(((Professor)funcionario).getDisciplina()));
+			} else {
+				stmt.setNull(7, Types.NULL);
+			}
+			
+			stmt.setDouble(8, Double.valueOf(funcionario.getSalario()));
+			stmt.setDouble(9, Double.valueOf(funcionario.getValeAlimentacao()));
+			stmt.setDouble(10, Double.valueOf(funcionario.getValeRefeicao()));
+			stmt.setDouble(11, Double.valueOf(funcionario.getValeTransporte()));
+			stmt.setString(12, String.valueOf(funcionario.getTelefone()));
+			stmt.setString(13, String.valueOf(funcionario.getEmail()));
+			stmt.setInt(14, Integer.valueOf(funcionario.getFilhos()));
+			stmt.setInt(15, 1);
 			
 			stmt.execute();
 			con.commit();
 			
+			String sqlLastInsert = "SELECT LAST_INSERT_ID()";
+			
+			stmt.close();
+			
+			stmt = con.prepareStatement(sqlLastInsert);
+			
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				funcionario.setCadastro(rs.getLong(1));
+				registrarFilhos(funcionario);
+				stmt.close();
+			}
+
+			stmt.close();
+			
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	private void registrarFilhos(Funcionario funcionario) {
+		String sql = "INSERT INTO filhos (fk_codigo, nome, datanascimento) VALUES (?, ?, ?); ";
+
+		try {
+			con.setAutoCommit(false);
+
+			PreparedStatement stmt = con.prepareStatement(sql);
+			
+			for (Pessoa filho : funcionario.getListaFilhos()) {
+				java.sql.Date d = new java.sql.Date(filho.getDataNascimento().getTime());
+				
+				stmt.setLong(1, funcionario.getCadastro());
+				stmt.setString(2, String.valueOf(filho.getNome()));
+				stmt.setDate(3, d);
+				
+				stmt.addBatch();
+			}
+			
+			stmt.executeBatch();
+			
+			con.commit();
+
 			stmt.close();
 			
 		} catch (SQLException e) {
@@ -133,7 +190,7 @@ public class FuncionarioDAO {
 					
 					if (rs.getString(7).equals("Professor")){func = new Professor();} else {func = new Funcionario();}
 					
-					func.setCadastro(rs.getString(1));
+					func.setCadastro(rs.getLong(1));
 					func.setNome(rs.getString(2));
 					func.setCpf(rs.getString(3));
 					func.setSexo(rs.getString(4));
@@ -177,7 +234,7 @@ public class FuncionarioDAO {
 		return listaFunc;
 	}
 	
-	public void alterarAluno(Aluno aluno) {
+	public void alterarFuncionario(Funcionario func) {
 		StringBuffer sql = new StringBuffer();
 		
 		sql.append("UPDATE alunos SET nome = ?, cpf = ?, sexo = ?, datanascimento = ?, endereço = ?, curso = ?, telefone = ?, email = ?");
@@ -188,17 +245,17 @@ public class FuncionarioDAO {
 
 			PreparedStatement stmt = con.prepareStatement(sql.toString());
 			
-			java.sql.Date d = new java.sql.Date(aluno.getDataNascimento().getTime());
+			java.sql.Date d = new java.sql.Date(func.getDataNascimento().getTime());
 			
-			stmt.setString(1, String.valueOf(aluno.getNome()));
-			stmt.setString(2, String.valueOf(aluno.getCpf()));
-			stmt.setString(3, String.valueOf(aluno.getSexo()));
+			stmt.setString(1, String.valueOf(func.getNome()));
+			stmt.setString(2, String.valueOf(func.getCpf()));
+			stmt.setString(3, String.valueOf(func.getSexo()));
 			stmt.setDate(4, d);
-			stmt.setString(5, String.valueOf(aluno.getEndereco()));
-			stmt.setString(6, String.valueOf(aluno.getCurso()));
-			stmt.setString(7, String.valueOf(aluno.getTelefone()));
-			stmt.setString(8, String.valueOf(aluno.getEmail()));
-			stmt.setLong(9, Long.valueOf(aluno.getMatricula()));
+			stmt.setString(5, String.valueOf(func.getEndereco()));
+			stmt.setString(6, String.valueOf(func.getCargo()));
+			stmt.setString(7, String.valueOf(func.getTelefone()));
+			stmt.setString(8, String.valueOf(func.getEmail()));
+			stmt.setLong(9, Long.valueOf(func.getCadastro()));
 			
 			stmt.execute();
 			con.commit();

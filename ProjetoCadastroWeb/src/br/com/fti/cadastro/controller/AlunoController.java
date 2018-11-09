@@ -3,18 +3,13 @@ package br.com.fti.cadastro.controller;
 import br.com.fti.cadastro.dao.AlunoDAO;
 import br.com.fti.cadastro.model.Aluno;
 
-import java.util.ArrayList;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class AlunoController {
@@ -40,23 +35,26 @@ public class AlunoController {
 	@RequestMapping("alunoCadastrado")
 	public String adiciona(@Valid Aluno aluno, BindingResult result, Model model) {
 		
-		model.addAttribute("aluno", aluno);
-		
 		if(result.hasFieldErrors()){
+			model.addAttribute("aluno", aluno);
 			return"alunos/formulario";
 		}
 		
 		System.out.println(aluno.getCpf());
 		
 		if(!UtilController.validaCpf(aluno.getCpf())){
+			model.addAttribute("aluno", aluno);
 			return "alunos/formulario";
 		}
 		
 		if(aluno.getMatricula() > 0){
 			dao.alterarAluno(aluno);
+			model.addAttribute("alunos", dao.consultarListaAluno());
 			return "alunos/listaAlunos";
 		}
+		
 		dao.cadastrarAluno(aluno);
+		model.addAttribute("alunos", dao.consultarListaAluno());
 		return "alunos/lista";
 	}
 	

@@ -101,7 +101,7 @@
 					</div>
 					
 					<br>
-					<br>
+
 					<h2>Informações financeiras</h2>
 					<div class="campo">
 						<label for="salario">Salário*:</label>
@@ -128,20 +128,19 @@
 					<br>
 					<div class="campo">
 						<label for="filhos">Número de dependentes*:</label>
-						<input id="campoFilhos" name="filhos" value="<c:if test='${not empty funcionario.fihos}'>${funcionario.filhos}</c:if><c:if test='${empty funcionario.fihos}'>0</c:if>" required> <button id="addFilhos">Adicionar Dependente</button>
+						<input id="campoFilhos" name="filhos" value="<c:if test='${not empty funcionario.fihos}'>${funcionario.filhos}</c:if><c:if test='${empty funcionario.fihos}'>0</c:if>" required disabled> <button id="addFilhos">Adicionar Dependente</button>
 						
 						<div class="formularioFilho" hidden>	                        
 				            <div class="campo">
 				                <span id="spanFilho"></span><br>
 				                <label for="nomeFilho">Nome*:</label>
-				                <input type="text" name="nomeFilho" placeholder="Nome" />
+				                <input type="text" name="nomeFilho" class="campoNomeFilho" placeholder="Nome" />
 				                <label for="dataFilho">Data de Nascimento*:</label>
-				                <input type="text" name="dataFilho" placeholder="__/__/____" />
+				                <input type="text" name="dataFilho" class="campoDataFilho" placeholder="__/__/____" />
 								<span style="cursor: pointer;" class="hideThis spanExcluir" onclick="excluirLinha(this)" ><i style="color: black;" class="material-icons">delete</i></span>
 							</div>							
 	     				</div>
 	     				<div class="fim"></div>
-</div>
 					</div>
 					
 				 	<input id="adicionar" class="button" type="submit" value="${funcionario.cadastro gt 0 ? 'Alterar' : 'Cadastrar'}"/>
@@ -153,8 +152,7 @@
 		<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.0/jquery.mask.js"></script>
 		<script src="resources/js/jquery.maskMoney.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/livequery/1.1.1/jquery.livequery.js"></script>
-
+		<script src="resources/js/livequery.js"></script>
 		
 		<script type="text/javascript">
 		var numFilhosAntes = 0;
@@ -166,6 +164,12 @@
 		var cursoTemErro = true;
 		var telefoneTemErro = true;
 		var emailTemErro = true;
+		var salarioTemErro = true;
+		var vaTemErro = true;
+		var vrTemErro = true;
+		var vtTemErro = true;
+		var numFilhosTemErro = true;
+		var cadastroFilhosTemErro = true;
 		
 		if ($("#cadastro").val() > 0){
 			nomeTemErro = false;
@@ -175,10 +179,18 @@
 			cursoTemErro = false;
 			telefoneTemErro = false;
 			emailTemErro = false;
+			salarioTemErro = false;
+			vaTemErro = false;
+			vrTemErro = false;
+			vtTemErro = false;
+			numFilhosTemErro = false;
+			cadastroFilhosTemErro = false;
+			
 		}
 		
 		$(document).ready(function () {
 			$('.dinheiro').maskMoney();
+			$(".campoDataFilho").mask('00/00/0000');
 			$("#adicionar").attr("title", erros);
 	        $("#campoCpf").mask('000.000.000-00', {reverse: true});
 	        $('#campoData').mask('00/00/0000');
@@ -313,12 +325,16 @@
 			});
 			
 			$(".spanExcluir").livequery("click", function(e){
-				alert('1');
 				excluirLinha($(this));
 			});
 			
+		
+			
 	    });
 		
+		$(".campoDataFilho").livequery("input", function(){
+			$(this).mask("00/00/0000");
+		});
 		
 		function erros(){
 			if (nomeTemErro || cpfTemErro || dataTemErro || enderecoTemErro|| cursoTemErro || telefoneTemErro || emailTemErro){
@@ -363,7 +379,6 @@
 		}	
 		
 		function excluirLinha(elemento){
-			alert('excluirLinha');
 			var numFilhos = $("#campoFilhos").val();
 			numFilhos = parseInt(numFilhos);
 			$(elemento).closest(".nova").remove();
