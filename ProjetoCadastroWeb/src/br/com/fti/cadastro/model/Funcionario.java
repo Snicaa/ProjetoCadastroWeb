@@ -1,14 +1,31 @@
 package br.com.fti.cadastro.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
 
 import br.com.fti.cadastro.controller.UtilController;
 
 public class Funcionario extends Pessoa {
+	
+	@NotNull
 	private Long cadastro;
+	
+	@NotNull
 	private String cargo;
-	private double salario, valeAlimentacao, valeTransporte, valeRefeicao;
+	
+	@NotNull
+	@Digits(integer=12, fraction=2)
+	private BigDecimal salario;
+	
+	@Digits(integer=12, fraction=2)
+	BigDecimal valeAlimentacao, valeTransporte, valeRefeicao;
+	
+	@NotNull
 	private int filhos;
+	
 	private ArrayList<Pessoa> listaFilhos;
 	
 	public Long getCadastro() {
@@ -27,7 +44,7 @@ public class Funcionario extends Pessoa {
 		this.cargo = cargo;
 	}
 	
-	public double getSalario() {
+	public BigDecimal getSalario() {
 		return salario;
 	}
 	
@@ -35,11 +52,14 @@ public class Funcionario extends Pessoa {
 		return UtilController.mascaraDinheiro(salario);
 	}
 	
-	public void setSalario(double salario) {
-		this.salario = salario;
+	public void setSalario(String salario) {
+		if(salario.contains(",")){
+			salario = UtilController.removeMascaraDinheiro(salario);
+		}
+		this.salario = new BigDecimal(salario);
 	}
 	
-	public double getValeAlimentacao() {
+	public BigDecimal getValeAlimentacao() {
 		return valeAlimentacao;
 	}
 	
@@ -47,11 +67,14 @@ public class Funcionario extends Pessoa {
 		return UtilController.mascaraDinheiro(valeAlimentacao);
 	}
 	
-	public void setValeAlimentacao(double valeAlimentacao) {
-		this.valeAlimentacao = valeAlimentacao;
+	public void setValeAlimentacao(String valeAlimentacao) {
+		if(valeAlimentacao.contains(",")){
+			valeAlimentacao = UtilController.removeMascaraDinheiro(valeAlimentacao);
+		}
+		this.valeAlimentacao = new BigDecimal(valeAlimentacao);
 	}
 	
-	public double getValeTransporte() {
+	public BigDecimal getValeTransporte() {
 		return valeTransporte;
 	}
 	
@@ -59,11 +82,14 @@ public class Funcionario extends Pessoa {
 		return UtilController.mascaraDinheiro(valeTransporte);
 	}
 	
-	public void setValeTransporte(double valeTransporte) {
-		this.valeTransporte = valeTransporte;
+	public void setValeTransporte(String valeTransporte) {
+		if(valeTransporte.contains(",")){
+			valeTransporte = UtilController.removeMascaraDinheiro(valeTransporte);
+		}
+		this.valeTransporte = new BigDecimal(valeTransporte);
 	}
 	
-	public double getValeRefeicao() {
+	public BigDecimal getValeRefeicao() {
 		return valeRefeicao;
 	}
 	
@@ -71,8 +97,11 @@ public class Funcionario extends Pessoa {
 		return UtilController.mascaraDinheiro(valeRefeicao);
 	}
 	
-	public void setValeRefeicao(double valeRefeicao) {
-		this.valeRefeicao = valeRefeicao;
+	public void setValeRefeicao(String valeRefeicao) {
+		if(valeRefeicao.contains(",")){
+			valeRefeicao = UtilController.removeMascaraDinheiro(valeRefeicao);
+		}
+		this.valeRefeicao = new BigDecimal(valeRefeicao);
 	}
 	
 	public int getFilhos() {

@@ -9,10 +9,9 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 		<title>Cadastro FTI</title>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-		<!--  <link rel="stylesheet" type="text/css" href="css/style.css"> -->
+		<link rel="stylesheet" type="text/css" href="resources/css/style.css">
 	</head>
 	<h1>Cadastrar Funcionário</h1>
-	<main>
 	<body>
 		<div>
 			<form:errors path="*" cssStyle="color:red"/>
@@ -50,7 +49,7 @@
 					</div>
 					<div class="campo">
 						<label for="curso">Cargo*:</label>
-						<select id="campoCurso" name="curso" required>
+						<select id="campoCargo" name="cargo" required>
 						
 						  	<option value="" disabled hidden 
 						  	<c:if test='${empty funcionario.cargo }'>selected</c:if>
@@ -84,6 +83,37 @@
 							<c:if test='${funcionario.cargo eq "Gerente"}'>selected</c:if>
 							>Gerente</option>
 							
+						</select>
+						<span class="validacao"></span><br/>
+					</div>
+					
+					<div class="campo" hidden>
+						<label for="disciplina">Disciplina*:</label>
+						<select id="campoDisciplina" name="disciplina">
+						
+						  	<option value="" disabled hidden 
+						  	<c:if test='${empty funcionario.disciplina }'>selected</c:if>
+						  	>Selecionar...</option>
+						  	
+							<option value="Banco de Dados" 
+							<c:if test='${funcionario.disciplina eq "Banco de Dados"}'>selected</c:if>
+							>Banco de Dados</option>
+								
+							<option value="Front-End"
+							<c:if test='${funcionario.disciplina eq "Front-end"}'>selected</c:if>
+							>Front-end</option>
+							
+							<option value="Java WEB"
+							<c:if test='${funcionario.disciplina eq "Java WEB"}'>selected</c:if>
+							>Java WEB</option>
+							
+							<option value="Linguagem de Programação Java"
+							<c:if test='${funcionario.disciplina eq "Linguagem de Programação Java"}'>selected</c:if>
+							>Linguagem de Programação Java</option>
+							
+							<option value="Outros"
+							<c:if test='${funcionario.disciplina eq "Outros"}'>selected</c:if>
+							>Outros</option>	
 						</select>
 						<span class="validacao"></span><br/>
 					</div>
@@ -128,7 +158,7 @@
 					<br>
 					<div class="campo">
 						<label for="filhos">Número de dependentes*:</label>
-						<input id="campoFilhos" name="filhos" value="<c:if test='${not empty funcionario.fihos}'>${funcionario.filhos}</c:if><c:if test='${empty funcionario.fihos}'>0</c:if>" required disabled> <button id="addFilhos">Adicionar Dependente</button>
+						<input id="campoFilhos" name="filhos" value="<c:if test='${not empty funcionario.fihos}'>${funcionario.filhos}</c:if><c:if test='${empty funcionario.fihos}'>0</c:if>" required readonly> <button id="addFilhos">Adicionar Dependente</button>
 						
 						<div class="formularioFilho" hidden>	                        
 				            <div class="campo">
@@ -142,7 +172,7 @@
 	     				</div>
 	     				<div class="fim"></div>
 					</div>
-					
+					<input id="resetar" type="reset"/ value="Limpar">
 				 	<input id="adicionar" class="button" type="submit" value="${funcionario.cadastro gt 0 ? 'Alterar' : 'Cadastrar'}"/>
 				</form>
 			</div>
@@ -155,57 +185,61 @@
 		<script src="resources/js/livequery.js"></script>
 		
 		<script type="text/javascript">
-		var numFilhosAntes = 0;
-		var flagBotao;
+		
 		var nomeTemErro = true;
 		var cpfTemErro = true;
 		var dataTemErro = true;
+		var cargoTemErro = true;
+		var disciplinaTemErro = false;
 		var enderecoTemErro = true;
-		var cursoTemErro = true;
 		var telefoneTemErro = true;
 		var emailTemErro = true;
 		var salarioTemErro = true;
-		var vaTemErro = true;
-		var vrTemErro = true;
-		var vtTemErro = true;
-		var numFilhosTemErro = true;
-		var cadastroFilhosTemErro = true;
-		
-		if ($("#cadastro").val() > 0){
-			nomeTemErro = false;
-			cpfTemErro = false;
-			dataTemErro = false;
-			enderecoTemErro = false;
-			cursoTemErro = false;
-			telefoneTemErro = false;
-			emailTemErro = false;
-			salarioTemErro = false;
-			vaTemErro = false;
-			vrTemErro = false;
-			vtTemErro = false;
-			numFilhosTemErro = false;
-			cadastroFilhosTemErro = false;
-			
-		}
+		var vaTemErro = false;
+		var vrTemErro = false;
+		var vtTemErro = false;
+		var filhosTemErro = true;
+		var nomeFilhoTemErro = false;
+		var dataFilhoTemErro = false;
 		
 		$(document).ready(function () {
+			
+			if($("#campoCargo").val() != "Professor"){
+				$("#campoDisciplina").closest(".campo").hide();
+			} else {
+				$("#campoDisciplina").removeAttr("hidden", "hidden");
+			}
+			
+			if ($("#cadastro").val() > 0){
+				nomeTemErro = false;
+				cpfTemErro = false;
+				dataTemErro = false;
+				cargoTemErro = false;
+				disciplinaTemErro = false;
+				enderecoTemErro = false;
+				telefoneTemErro = false;
+				emailTemErro = false;
+				salarioTemErro = false;
+				vaTemErro = false;
+				vrTemErro = false;
+				vtTemErro = false;
+				filhosTemErro = false;
+				nomeFilhoTemErro = false;
+				dataFilhoTemErro = false;
+			}
+			
 			$('.dinheiro').maskMoney();
 			$(".campoDataFilho").mask('00/00/0000');
 			$("#adicionar").attr("title", erros);
 	        $("#campoCpf").mask('000.000.000-00', {reverse: true});
 	        $('#campoData').mask('00/00/0000');
 	        $('#campoTelefone').mask('(00) 0000-0000');
-	        if($("#campoFilhos").val() > 0){
-	        	$("#addFilhos").removeAttr("disabled", "disabled");
-	        }
 	        
 	        $("#campoNome").blur(function(){
 				if($(this).val().length < 5 || $(this).val().length > 30){
-					$(this).closest(".campo").find(".validacao").html("Nome inválido (5 a 50 caracteres)");
-					nomeTemErro = true;
+					$(this).closest(".campo").find(".validacao").html("Nome inválido (5 a 50 caracteres)").addClass("hasErro");
 				} else {
-					$(this).closest(".campo").find(".validacao").html("");
-					nomeTemErro = false;
+					$(this).closest(".campo").find(".validacao").html("").removeClass("hasErro");
 					$("#adicionar").attr("title", erros);
 				}
 			});
@@ -215,10 +249,11 @@
 				$.post("validaCpf?cpf=" + cpf, function(resposta){
 					$("#campoCpf").closest(".campo").find(".validacao").html(resposta);
 					if (resposta == ""){
+						$("#campoCpf").closest(".campo").find(".validacao").removeClass("hasErro");
 						cpfTemErro = false;
 						$("#adicionar").attr("title", erros);
 					} else {
-						cpfTemErro = true;
+						$("#campoCpf").closest(".campo").find(".validacao").addClass("hasErro");
 					}
 				})
 			});
@@ -237,32 +272,39 @@
 			
 			$("#campoEndereco").blur(function(){
 				if($(this).val().length < 10 || $(this).val().length > 255){
-					$(this).closest(".campo").find(".validacao").html("Endereço inválido (10 a 255 caracteres)");
-					enderecoTemErro = true;
+					$(this).closest(".campo").find(".validacao").html("Endereço inválido (10 a 255 caracteres)").addClass("hasErro");
 				} else {
-					$(this).closest(".campo").find(".validacao").html("");
-					enderecoTemErro = false;
+					$(this).closest(".campo").find(".validacao").html("").removeClass("hasErro");
 					$("#adicionar").attr("title", erros);
 				}
 			});
 			
-			$("#campoCurso").blur(function(){
-				if($(this).val() == "Selecionar..."){
-					$(this).closest(".campo").find(".validacao").html("Selecione um curso");
-					cursoTemErro = true;
+			$("#campoCargo").change(function(){
+				if($("#campoCargo").val() == "Selecionar..."){
+					$(this).closest(".campo").find(".validacao").html("Selecione um cargo");
+					cargoTemErro = true;
 				} else {
 					$(this).closest(".campo").find(".validacao").html("");
-					cursoTemErro = false;
+					cargoTemErro = false;
+					if ($("#campoCargo").val() == "Professor"){
+						$("#campoDisciplina").closest(".campo").removeAttr("hidden", "hidden");
+						$("#campoDisciplina").closest(".campo").show();
+						disciplinaTemErro = true;
+					} else {
+						$("#campoDisciplina").closest(".campo").attr("hidden", "hidden");
+						$("#campoDisciplina").closest(".campo").hide();
+						disciplinaTemErro = false;
+					}
 					$("#adicionar").attr("title", erros);
 				}
 			});
 			
 			$("#campoTelefone").blur(function(){
 				if ($(this).val().length < 10 || $(this).val().length > 15){
-					$(this).closest(".campo").find(".validacao").html("Telefone inválido");
+					$(this).closest(".campo").find(".validacao").html("Telefone inválido").addClass("hasErro");
 					telefoneTemErro = true;
 				} else {
-					$(this).closest(".campo").find(".validacao").html("");
+					$(this).closest(".campo").find(".validacao").html("").removeClass("hasErro");
 					telefoneTemErro = false;
 					$("#adicionar").attr("title", erros);
 				}
@@ -276,15 +318,6 @@
 					$(this).closest(".campo").find(".validacao").html("");
 					emailTemErro = false;
 					$("#adicionar").attr("title", erros);
-				}
-			});
-			
-			$("#campoFilhos").on("input", function(){
-				var valor = $(this).val();
-				if (valor > 0){
-					$(".formularioFilho").removeAttr("hidden", "hidden");
-				} else {
-					$(".formularioFilho").attr("hidden", "hidden");
 				}
 			});
 			
@@ -311,7 +344,7 @@
 					novaLinha.removeClass("formularioFilho").addClass("nova").find("input[name=nomeFilho]").focus();
 					
 					novaLinha.find(".hideThis").removeClass("hideThis");
-				
+					novaLinha.find("input[name=dataFilho]").mask('00/00/0000');
 					novaLinha.insertBefore(".fim");
 				}
 				
@@ -328,8 +361,6 @@
 				excluirLinha($(this));
 			});
 			
-		
-			
 	    });
 		
 		$(".campoDataFilho").livequery("input", function(){
@@ -337,32 +368,54 @@
 		});
 		
 		function erros(){
-			if (nomeTemErro || cpfTemErro || dataTemErro || enderecoTemErro|| cursoTemErro || telefoneTemErro || emailTemErro){
+			if (nomeTemErro || cpfTemErro || dataTemErro || cargoTemErro || disciplinaTemErro || enderecoTemErro || telefoneTemErro || emailTemErro || 
+					salarioTemErro || vaTemErro || vrTemErro || vtTemErro || filhosTemErro || nomeFilhoTemErro || dataFilhoTemErro){
 				$("#adicionar").attr("disabled", "disabled");
 			} else {
 				$("#adicionar").removeAttr("disabled", "disabled");
 			}
+			
 			var stringErros = "";
+			
 			if (nomeTemErro){
-				stringErros = stringErros + "Nome inválido;\n";
+				stringErros = stringErros + "Nome inválido\n";
 			}
 			if (cpfTemErro){
-				stringErros = stringErros + "CPF inválido;\n";
+				stringErros = stringErros + "CPF inválido\n";
 			}
 			if (dataTemErro){
-				stringErros = stringErros + "Data inválida;\n";
+				stringErros = stringErros + "Data de nascimento inválida\n";
 			}
 			if (enderecoTemErro){
 				stringErros = stringErros + "Endereço inválido;\n";
 			}
-			if (cursoTemErro){
-				stringErros = stringErros + "Selecione o curso;\n";
+			if (cargoTemErro){
+				stringErros = stringErros + "Selecione o cargo;\n";
+			}
+			
+			if (disciplinaTemErro){
+				stringErros = stringErros + "Selecione a disciplina\n";
 			}
 			if (telefoneTemErro){
-				stringErros = stringErros + "Número de telefone inválido;\n";
+				stringErros = stringErros + "Número de telefone inválido\n";
 			}
 			if (emailTemErro){
-				stringErros = stringErros + "Endereço de e-mail inválido;";
+				stringErros = stringErros + "E-mail inválido\n";
+			}
+			if (salarioTemErro){
+				stringErros = stringErros + "Salário inválido\n"
+			}
+			if (vaTemErro){
+				stringErros = stringErros + "Preencha o valor do Vale Alimentação corretamente\n"
+			}
+			if (vrTemErro){
+				stringErros = stringErros + "Preencha o valor do Vale Refeição corretamente\n"
+			}
+			if (vtTemErro){
+				stringErros = stringErros + "Preencha o valor do Vale Transporte corretamente\n"
+			}
+			if (stringErros == ""){
+				stringErros = "Clique para Cadastrar o Funcionário"
 			}
 			return stringErros;
 		}
@@ -385,10 +438,7 @@
 			numFilhos = numFilhos - 1;
 			$("#campoFilhos").val(numFilhos);
 		}
-		
-		
 		</script>
-	</main>
 </html>
 
 

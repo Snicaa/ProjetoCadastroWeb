@@ -19,12 +19,12 @@ import br.com.fti.cadastro.model.Pessoa;
 import br.com.fti.cadastro.model.Professor;
 
 @Repository
-public class FuncionarioDAO {
+public class ProfessorDAO {
 	
 	private final Connection con;
 	private int codigoAtual;
 	
-	public FuncionarioDAO(DataSource dataSource) {
+	public ProfessorDAO(DataSource dataSource) {
 		try {
 			this.con = dataSource.getConnection();
 		} catch (SQLException e) {

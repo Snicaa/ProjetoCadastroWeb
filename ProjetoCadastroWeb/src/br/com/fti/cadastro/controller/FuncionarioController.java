@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import br.com.fti.cadastro.dao.FuncionarioDAO;
 import br.com.fti.cadastro.model.Funcionario;
 import br.com.fti.cadastro.model.Pessoa;
+import br.com.fti.cadastro.model.Professor;
 
 @Controller
 public class FuncionarioController {
@@ -37,9 +38,9 @@ public class FuncionarioController {
 	}
 	
 	@RequestMapping("funcionarioCadastrado")
-	public String adiciona(@Valid Funcionario funcionario, BindingResult result, String[] nomeFilho, String[] dataFilho, Model model) {
+	public String adiciona(@Valid Funcionario funcionario, BindingResult result, String disciplina, String[] nomeFilho, String[] dataFilho, Model model) {
 		
-		model.addAttribute("aluno", funcionario);
+		model.addAttribute("funcionario", funcionario);
 		
 		if(result.hasFieldErrors()){
 			return"funcionarios/formulario";
@@ -50,18 +51,22 @@ public class FuncionarioController {
 		}
 		
 		if (!nomeFilho[0].equals("")){
-			funcionario.setListaFilhos(geraListaFilhos(nomeFilho, dataFilho));
+			funcionario.setListaFilhos(FuncionarioController.geraListaFilhos(nomeFilho, dataFilho));
+		}
+		
+		if (disciplina != null && !disciplina.equals("")){
+			funcionario = instanciaProfessor(funcionario, disciplina);
 		}
 		
 		if(funcionario.getCadastro() > 0){
 			dao.alterarFuncionario(funcionario);
-			return "alunos/listaAlunos";
+			return "funcionarios/listaFuncionarios";
 		}
 		dao.cadastrarFuncionario(funcionario);
 		return "funcionarios/lista";
 	}
 	
-	public ArrayList<Pessoa> geraListaFilhos(String[] nomeFilho, String[] dataFilho){
+	public static ArrayList<Pessoa> geraListaFilhos(String[] nomeFilho, String[] dataFilho){
 		ArrayList<Pessoa> listaFilhos = new ArrayList<Pessoa>();
 		
 		for(int i = 0; i < nomeFilho.length; i++){
@@ -73,6 +78,31 @@ public class FuncionarioController {
 		}
 		
 		return listaFilhos;
+	}
+	
+	private Professor instanciaProfessor(Funcionario func, String disciplina){
+		Professor prof = new Professor();
+		
+		prof.setCadastro(func.getCadastro());
+		prof.setNome(func.getNome());
+		prof.setCpf(func.getCpf());
+		prof.setDataNascimento(UtilController.sdf.format(func.getDataNascimento()));
+		prof.setSexo(func.getSexo());
+		prof.setEndereco(func.getEndereco());
+		prof.setEmail(func.getEmail());
+		prof.setTelefone(func.getTelefone());
+		
+		prof.setCargo(func.getCargo());
+		prof.setDisciplina(disciplina);
+		
+		prof.setSalario(func.getSalario().toString());
+		prof.setValeAlimentacao(func.getValeAlimentacao().toString());
+		prof.setValeRefeicao(func.getValeRefeicao().toString());
+		prof.setValeTransporte(func.getValeTransporte().toString());
+		prof.setFilhos(func.getFilhos());
+		prof.setListaFilhos(func.getListaFilhos());
+		
+		return prof;
 	}
 	
 }

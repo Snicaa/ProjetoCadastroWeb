@@ -24,12 +24,8 @@ public class Pessoa {
 
 	private String cpf;
 	
-	//@Pattern(message="Data inválida", regexp="^([0-2][0-9]|(3)[0-1])(\\/)(((0)[0-9])|((1)[0-2]))(\\/)\\d{4}$")
-	private String dataNascimento;
-	
-	//@Past(message="Data de nascimento inválida")
-	//@DateTimeFormat(pattern="dd/MM/yyyy")
-	//private Date dataNascimento;
+	@Pattern(message="Data inválida", regexp="^([0-2][0-9]||3[0-1])/(0[0-9]||1[0-2])/[0-9][0-9][0-9][0-9]$")
+	private String dataNascimento;	
 	
 	@NotNull
 	private String sexo;	
@@ -39,7 +35,7 @@ public class Pessoa {
 	private String endereco;
 	
 	@NotNull
-	@Size(min=2, max=20, message="Número de telefone inválido")
+	@Size(min=10, max=20, message="Número de telefone inválido")
 	private String telefone;
 	
 	@Size(max=35, message = "E-mail muito longo")

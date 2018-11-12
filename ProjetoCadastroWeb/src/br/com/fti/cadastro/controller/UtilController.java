@@ -1,5 +1,6 @@
 package br.com.fti.cadastro.controller;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -136,8 +137,16 @@ public class UtilController {
 		return telefone;
 	}
 	
-	public static String mascaraDinheiro(Double grana){
+	public static String mascaraDinheiro(BigDecimal grana){
 		String dinheiro = UtilController.nF.format(grana);
+		return dinheiro;
+	}
+	
+	public static String removeMascaraDinheiro(String dinheiro){
+		dinheiro = dinheiro.replace("R$ ", "");
+		dinheiro = dinheiro.replace(".", "");
+		dinheiro = dinheiro.replace(",", ".");
+		
 		return dinheiro;
 	}
 }
