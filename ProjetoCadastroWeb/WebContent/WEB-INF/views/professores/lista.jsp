@@ -90,31 +90,8 @@
 											</tr>
 											<tr>
 												<td colspan="6">
-													<div class="divTabelaFilhos">
-														<table style="width: 100%;">
-															<tr>
-																<th colspan="3">Filhos</th>
-															</tr>
-															<tr>
-																<th></th>
-																<th>Nome</th>
-																<th>Data de Nascimento</th>
-																<th></th>
-															</tr>
-															<c:set var="counter" value="1"/>
-															<c:forEach items="${professor.listaFilhos}" var="filho">
-																<tr>
-																	<td style="text-align: right;">Filho ${counter}</td>
-																	<td style="text-align: center;">${filho.nome}</td>
-																	<td style="text-align: center;"><fmt:formatDate
-																				value="${filho.dataNascimento}"
-																				pattern="dd/MM/yyyy"/>
-																	</td>
-																</tr>
-																	<c:set var="counter" value="${counter+1}"/>
-																</c:forEach>
-															</table>
-														</div>
+													<div class="divTabelaFilhos">	
+													</div>
 												</td>
 											</tr>
 										</c:if>
@@ -144,5 +121,40 @@
 			}
 		})
 	})
+	
+	function ajaxFilhos(cadastro) {
+			var html = "";
+			var data = {
+				   cadastro: cadastro
+        			};   
+						   
+			$.ajax({
+				url:"getListaDependentes",
+				type: "GET",
+				async:false,
+				data: data,
+				dataType:"json",
+			    cache: true,
+				contentType: 'application/x-www-form-urlencoded; charset=iso-8859-1;', 
+				success: function (filhos) {
+					console.log(filhos.length);
+					if (filhos.length > 0) {
+						html = "Dependentes"
+						html = html + "<table border='1' cellpadding='0' cellspacing='0' width='100%'>";
+						html = html + "<thead><tr><th>Nome</th>";
+						html = html + "<th>Data de Nascimento</th>";
+						html = html + "</tr></thead>";
+					} else {
+					   	html = "<div>Dados não encontrados.</div>";
+					}
+			         $.each(filhos, function(index, filho) {
+					   	html = html + "<tbody><tr><td><span style='text-align: center;'>" + filho.nome + "</span></td>";
+						html = html + "<td><span class=''>" + filho.dataNascimento + "</span></td>";
+						html = html + "</tr></tbody>";
+			         });    
+			       $("#funcionario_" + cadastro).empty().html(html);
+			    }				
+			});
+		}
 	</script>
 </html>

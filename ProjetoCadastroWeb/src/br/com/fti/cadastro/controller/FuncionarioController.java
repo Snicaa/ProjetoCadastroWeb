@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import br.com.fti.cadastro.dao.FuncionarioDAO;
 import br.com.fti.cadastro.model.Funcionario;
@@ -103,6 +105,11 @@ public class FuncionarioController {
 		prof.setListaFilhos(func.getListaFilhos());
 		
 		return prof;
+	}
+	
+	@RequestMapping(value="getListaDependentes", method=RequestMethod.GET, produces="application/json")
+	public @ResponseBody ArrayList<Pessoa> getListaDependentes(Long cadastro) {
+		return dao.consultarFilhos(cadastro);
 	}
 	
 }

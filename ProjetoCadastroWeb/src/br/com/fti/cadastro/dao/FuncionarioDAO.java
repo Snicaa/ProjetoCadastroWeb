@@ -122,6 +122,35 @@ public class FuncionarioDAO {
 		}
 	}
 	
+	public ArrayList<Pessoa> consultarFilhos(Long cadastro){
+		ArrayList<Pessoa> listaFilhos = new ArrayList<Pessoa>();
+		
+		String sql = "SELECT nome, datanascimento FROM filhos WHERE fk_codigo = ?;";
+		
+		try {
+			PreparedStatement stmt = con.prepareStatement(sql);
+			
+			stmt.setLong(1, cadastro);
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			while(rs.next()){
+				Pessoa filho = new Pessoa();
+				
+				filho.setNome(rs.getString(1));
+				filho.setDataNascimento(UtilController.sdf.format(rs.getDate(2)));
+				
+				listaFilhos.add(filho);
+			}
+			
+			stmt.close();
+			
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return listaFilhos;
+	}
+	
 	public Aluno consultarPorCodigo(Long cadastro){
 		String sql = "SELECT nome, cpf, sexo, datanascimento, endereço, curso, telefone, email "
 				+ "FROM alunos WHERE ativo = 1 AND matricula = ? "
@@ -130,7 +159,7 @@ public class FuncionarioDAO {
 		Aluno aluno = new Aluno();
 		
 		try {
-			PreparedStatement stmt = con.prepareStatement(sql.toString());
+			PreparedStatement stmt = con.prepareStatement(sql);
 			
 			stmt.setLong(1, cadastro);
 			
