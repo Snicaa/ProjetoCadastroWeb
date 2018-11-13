@@ -291,7 +291,7 @@
 						$("#campoDisciplina").closest(".campo").show();
 						disciplinaTemErro = true;
 					} else {
-						$("#campoDisciplina").closest(".campo").attr("hidden", "hidden");
+						$("#campoDisciplina").val("").closest(".campo").attr("hidden", "hidden");
 						$("#campoDisciplina").closest(".campo").hide();
 						disciplinaTemErro = false;
 					}

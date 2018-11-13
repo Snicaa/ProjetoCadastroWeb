@@ -1,6 +1,7 @@
 package br.com.fti.cadastro.controller;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.validation.Valid;
 
@@ -108,8 +109,10 @@ public class FuncionarioController {
 	}
 	
 	@RequestMapping(value="getListaDependentes", method=RequestMethod.GET, produces="application/json")
-	public @ResponseBody ArrayList<Pessoa> getListaDependentes(Long cadastro) {
-		return dao.consultarFilhos(cadastro);
+	public @ResponseBody List<Pessoa> getListaDependentes(String cadastro) {
+		System.out.println(cadastro);
+		List<Pessoa> list = dao.consultarFilhos(Long.parseLong(cadastro));
+		return list;
 	}
 	
 }

@@ -37,7 +37,7 @@
 				</tfoot>
 				<tbody>
 					<c:forEach items="${funcionarios}" var="funcionario">
-						<tr id="funcionario_${funcionario.cadastro}">
+						<tr id="${funcionario.cadastro}">
 							<td>${funcionario.cadastro}</td>
 							<td>${funcionario.nome}</td>
 							<td>${funcionario.cpfFormatado}</td>
@@ -60,7 +60,7 @@
 							<td style="display: flex-box; flex-orientation: row;"><a href="mostraAluno?matricula=${funcionario.cadastro}"><i style="color: black; margin-left:2%;" class="material-icons">create</i></a> &nbsp
 							<a href="removeTarefa?id=${funcionario.cadastro}"><i style="color: black;" class="material-icons">delete</i></a></td>
 						</tr>
-						<tr id="funcionario_${funcionario.cadastro}aux" class="auxTr">
+						<tr id="funcionario_${funcionario.cadastro}" class="auxTr">
 							<td colspan="9">
 								<div class="divAuxInfo">
 									<table style="width: 100%;">
@@ -87,8 +87,6 @@
 											<td>${funcionario.disciplina}</td>
 											</c:if>
 										</tr>
-										
-										<c:if test="${funcionario.filhos gt 0}">
 											<tr>
 												<td> &nbsp</td>
 											</tr>
@@ -99,11 +97,11 @@
 												<c:if test="${funcionario.cargo != 'Professor'}">
 													<td colspan="5">
 												</c:if>
-													<div class="divTabelaFilhos">
+													<div class="divTabelaFilhos" style="text-align:center;">
 														
 													</div>
+													</td>
 											</tr>
-										</c:if>
 									</table>
 								</div>
 							</td>
@@ -122,46 +120,51 @@
 			event.stopPropagation();
 			
 			var $target = $(event.target);
-			
-			if($target.closest("div").closest("tr").find("td").attr("colspan") > 8) {
-				$target.closest("div").slideUp();
+				
+			if($target.closest(".auxTr").find("td").attr("colspan") > 8) {
+				$target.closest(".divAuxInfo").slideUp();
 			} else { 
+				if (!$target.closest("tr").next().find(".divAuxInfo").find(".divTabelaFilhos").hasClass("deuAjax")){
+					ajaxFilhos($target.closest("tr").attr("id"));
+				}
 					$target.closest("tr").next().find(".divAuxInfo").slideToggle();
 			}
 		})
 	})
 	
-	function ajaxFilhos(cadastro) {
+	function ajaxFilhos(id) {
 			var html = "";
-			var data = {
-				   cadastro: cadastro,
+			var parametro = {
+				   cadastro: id
         			};   
 						   
 			$.ajax({
 				url:"getListaDependentes",
 				type: "GET",
 				async:false,
-				data: data,
+				data: parametro,
 				dataType:"json",
 			    cache: true,
 				contentType: 'application/x-www-form-urlencoded; charset=iso-8859-1;', 
-				success: function (filhos) {
-					if(filhos.length > 0){
+				success:  function (filhos) {
+					console.log(filhos.length)
+					if(parseInt(filhos.length) > 0){
 						html = "Dependentes"
-						html = html + "<table border='1' cellpadding='0' cellspacing='0' width='100%'>";
-						html = html + "<thead><tr><th>Nome</th>";
-						html = html + "<th>Data de Nascimento</th>";
+						html = html + "<table class='tabelaFilhos' width='100%'>";
+						html = html + "<thead><tr><th style='width: 50%;'>Nome</th>"
+						html = html + "<th style='width: 50%;'>Data de Nascimento</th>";
 						html = html + "</tr></thead>";
 					} else {
 					   	html = "<div>Este funcionário não possui dependentes</div>";
 					}
 			         $.each(filhos, function(index, filho) {
-					   	html = html + "<tbody><tr><td><span style='text-align: center;'>" + filho.nome + "</span></td>";
-						html = html + "<td><span class=''>" + filho.dataNascimento + "</span></td>";
-						html = html + "</tr></tbody></table>";
-			         });    
-			       $("#funcionario_" + cadastro).empty().html(html);
-			    }				
+					   	html = html + "<tr><td style='text-align: center;'>" + filho.nome + "</td>";
+						html = html + "<td style='text-align: center;'>" + filho.dataNascimentoStr + "</td>";
+						html = html + "</tr>";
+			         });
+			         html = html + "</table>"
+			       $("#funcionario_" + id).find(".divTabelaFilhos").addClass("deuAjax").empty().html(html);
+			    }	
 			});
 		}
 	</script>

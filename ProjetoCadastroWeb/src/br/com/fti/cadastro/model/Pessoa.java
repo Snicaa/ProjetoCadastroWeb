@@ -80,7 +80,11 @@ public class Pessoa {
 			return null;
 		}
 	}
-
+	
+	public String getDataNascimentoStr(){
+		return this.dataNascimento;
+	}
+	
 	public void setDataNascimento(String Str) {
 		this.dataNascimento = Str;
 	}
