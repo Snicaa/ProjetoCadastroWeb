@@ -1,36 +1,41 @@
 package br.com.fti.cadastro.model;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.validation.constraints.Digits;
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.Past;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Email;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import com.sun.istack.internal.NotNull;
 
 import br.com.fti.cadastro.controller.UtilController;
 
+@MappedSuperclass
 public class Pessoa {
 	
 	@NotNull
 	@Size(min=2, max=50, message = "Campo nome deve ser preenchido (2 a 50 caracteres")
 	private String nome;
-
+	
+	@Size(min=11, max=11)
 	private String cpf;
 	
-	@Pattern(message="Data inválida", regexp="^([0-2][0-9]||3[0-1])/(0[0-9]||1[0-2])/[0-9][0-9][0-9][0-9]$")
-	private String dataNascimento;	
+	@Column(name = "datanascimento")
+	@Temporal(TemporalType.DATE)
+	@Past
+	private Date dataNascimento;	
 	
 	@NotNull
+	@Size(min=1, max=1)
 	private String sexo;	
 	
 	@NotNull
+	@Column(name = "endereço")
 	@Size(max=255, message="Endereço não pode possuir mais de 255 caracteres")
 	private String endereco;
 	
@@ -41,6 +46,8 @@ public class Pessoa {
 	@Size(max=35, message = "E-mail muito longo")
 	@Email(message = "E-mail deve ser válido.")
 	private String email;
+	
+	private int ativo;
 
 	public String getNome() {
 		return nome;
@@ -73,20 +80,19 @@ public class Pessoa {
 	}
 	
 	public Date getDataNascimento() {
-		try {
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-		return sdf.parse(dataNascimento);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-	
-	public String getDataNascimentoStr(){
 		return this.dataNascimento;
 	}
 	
-	public void setDataNascimento(String Str) {
-		this.dataNascimento = Str;
+	public String getDataNascimentoStr(){
+		return UtilController.sdf.format(dataNascimento);
+	}
+	
+	public void setDataNascimento(Date data){
+		this.dataNascimento = data;
+	}
+	
+	public void setDataNascimentoStr(String str) {
+		this.dataNascimento = UtilController.converteStringEmData(str);
 	}
 
 	public String getSexo() {
@@ -126,6 +132,14 @@ public class Pessoa {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+	public void setAtivo(int ativo){
+		this.ativo = ativo;
+	}
+	
+	public int getAtivo(){
+		return this.ativo;
 	}
 	
 }

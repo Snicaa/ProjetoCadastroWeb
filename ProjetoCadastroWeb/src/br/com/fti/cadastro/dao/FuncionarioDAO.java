@@ -138,7 +138,7 @@ public class FuncionarioDAO {
 				Pessoa filho = new Pessoa();
 				
 				filho.setNome(rs.getString(1));
-				filho.setDataNascimento(UtilController.sdf.format(rs.getDate(2)));
+				filho.setDataNascimento(rs.getDate(2));
 				
 				listaFilhos.add(filho);
 			}
@@ -170,7 +170,7 @@ public class FuncionarioDAO {
 				aluno.setNome(rs.getString(1));
 				aluno.setCpf(rs.getString(2));
 				aluno.setSexo(rs.getString(3));
-				aluno.setDataNascimento(UtilController.sdf.format(new Date(rs.getTimestamp("datanascimento").getTime())));
+				aluno.setDataNascimento(new Date(rs.getTimestamp("datanascimento").getTime()));
 				aluno.setEndereco(rs.getString(5));
 				aluno.setCurso(rs.getString(6));
 				aluno.setTelefone(rs.getString(7));
@@ -208,7 +208,7 @@ public class FuncionarioDAO {
 				if (codigoAtual == rs.getInt(1)) {
 					Pessoa filho = new Pessoa();
 					filho.setNome(rs.getString(16));
-					filho.setDataNascimento(UtilController.sdf.format(new Date(rs.getTimestamp("FILHO.datanascimento").getTime())));
+					filho.setDataNascimento(new Date(rs.getTimestamp("FILHO.datanascimento").getTime()));
 					arrayFilhos.add(filho);
 				} else {
 					if (rs.getRow() != 1) {
@@ -223,7 +223,7 @@ public class FuncionarioDAO {
 					func.setNome(rs.getString(2));
 					func.setCpf(rs.getString(3));
 					func.setSexo(rs.getString(4));
-					func.setDataNascimento(UtilController.sdf.format(new Date(rs.getTimestamp("FUNC.datanascimento").getTime())));
+					func.setDataNascimento(new Date(rs.getTimestamp("FUNC.datanascimento").getTime()));
 					func.setEndereco(rs.getString(6));
 					func.setCargo(rs.getString(7));
 					
@@ -244,7 +244,7 @@ public class FuncionarioDAO {
 					if (func.getFilhos() > 0) {
 						Pessoa filho = new Pessoa();
 						filho.setNome(rs.getString(16));
-						filho.setDataNascimento(UtilController.sdf.format(new Date(rs.getTimestamp("FILHO.datanascimento").getTime())));
+						filho.setDataNascimento(new Date(rs.getTimestamp("FILHO.datanascimento").getTime()));
 						arrayFilhos.add(filho);
 					}
 				}

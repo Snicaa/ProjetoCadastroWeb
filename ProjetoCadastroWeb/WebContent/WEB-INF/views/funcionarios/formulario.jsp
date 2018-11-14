@@ -32,7 +32,7 @@
 					
 					<div class="campo">
 						<label for="dataNascimento">Data de Nascimento*:</label>
-						<input id="campoData" type="text" name="dataNascimento" value="<fmt:formatDate value='${funcionario.dataNascimento}'/>" required pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}" placeholder="dd/mm/aaaa">
+						<input id="campoData" type="text" name="dataNascimentoStr" value="<fmt:formatDate value='${funcionario.dataNascimento}'/>" required pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}" placeholder="dd/mm/aaaa">
 						<span class="validacao"></span><br/>
 					</div>
 					<div class="campoRadio">

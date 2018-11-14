@@ -3,6 +3,9 @@ package br.com.fti.cadastro.controller;
 import br.com.fti.cadastro.dao.AlunoDAO;
 import br.com.fti.cadastro.model.Aluno;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class AlunoController {
+	EntityManagerFactory factory = Persistence.createEntityManagerFactory("alunos");
+	EntityManager manager = factory.createEntityManager();
 	
 	private final AlunoDAO dao;
 	
@@ -40,8 +45,6 @@ public class AlunoController {
 			return"alunos/formulario";
 		}
 		
-		System.out.println(aluno.getCpf());
-		
 		if(!UtilController.validaCpf(aluno.getCpf())){
 			model.addAttribute("aluno", aluno);
 			return "alunos/formulario";
@@ -53,7 +56,16 @@ public class AlunoController {
 			return "alunos/listaAlunos";
 		}
 		
-		dao.cadastrarAluno(aluno);
+		aluno.setMatricula(null);
+		aluno.setAtivo(1);
+		
+		manager.getTransaction().begin();
+		manager.persist(aluno);
+		manager.getTransaction().commit();
+		
+		manager.close();
+		factory.close();
+		
 		model.addAttribute("alunos", dao.consultarListaAluno());
 		return "alunos/lista";
 	}

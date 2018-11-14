@@ -149,4 +149,14 @@ public class UtilController {
 		
 		return dinheiro;
 	}
+	
+	public static Date converteStringEmData(String str){
+		Date data = new Date();
+		try{
+			data = UtilController.sdf.parse(str);
+		} catch (ParseException e){
+			
+		}
+		return data;
+	}
 }

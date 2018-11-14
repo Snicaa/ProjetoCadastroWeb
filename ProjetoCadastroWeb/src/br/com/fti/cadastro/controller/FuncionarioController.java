@@ -75,7 +75,7 @@ public class FuncionarioController {
 		for(int i = 0; i < nomeFilho.length; i++){
 			Pessoa filho = new Pessoa();
 			filho.setNome(nomeFilho[i]);
-			filho.setDataNascimento(dataFilho[i]);
+			filho.setDataNascimento(UtilController.converteStringEmData(dataFilho[i]));
 			
 			listaFilhos.add(filho);
 		}
@@ -89,7 +89,7 @@ public class FuncionarioController {
 		prof.setCadastro(func.getCadastro());
 		prof.setNome(func.getNome());
 		prof.setCpf(func.getCpf());
-		prof.setDataNascimento(UtilController.sdf.format(func.getDataNascimento()));
+		prof.setDataNascimento(func.getDataNascimento());
 		prof.setSexo(func.getSexo());
 		prof.setEndereco(func.getEndereco());
 		prof.setEmail(func.getEmail());

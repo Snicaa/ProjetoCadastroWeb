@@ -80,7 +80,7 @@ public class AlunoDAO {
 				aluno.setNome(rs.getString(1));
 				aluno.setCpf(rs.getString(2));
 				aluno.setSexo(rs.getString(3));
-				aluno.setDataNascimento(UtilController.sdf.format(new Date(rs.getTimestamp("datanascimento").getTime())));
+				aluno.setDataNascimento(new Date(rs.getTimestamp("datanascimento").getTime()));
 				aluno.setEndereco(rs.getString(5));
 				aluno.setCurso(rs.getString(6));
 				aluno.setTelefone(rs.getString(7));
@@ -116,7 +116,7 @@ public class AlunoDAO {
 				aluno.setNome(rs.getString(2));
 				aluno.setCpf(rs.getString(3));
 				aluno.setSexo(rs.getString(4));
-				aluno.setDataNascimento(UtilController.sdf.format(new Date(rs.getTimestamp("datanascimento").getTime())));
+				aluno.setDataNascimento(new Date(rs.getTimestamp("datanascimento").getTime()));
 				aluno.setEndereco(rs.getString(6));
 				aluno.setCurso(rs.getString(7));
 				aluno.setTelefone(rs.getString(8));
