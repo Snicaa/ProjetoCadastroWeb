@@ -204,6 +204,27 @@
 		
 		$(document).ready(function () {
 			
+			var pv = true;
+			
+			if ($("#campoFilhos").val() > 0) {
+				<c:forEach items="${funcionario.listaFilhos}" var="filho">
+					if (pv) {
+						$(".campoNomeFilho").val("${filho.nome}");
+						$(".campoDataFilho").val('<fmt:formatDate value="${filho.dataNascimento}" pattern="dd/MM/yyyy"/>');
+						pv = false;
+					} else {
+						var novaLinha = $(".formularioFilho").clone();
+						novaLinha.removeClass("formularioFilho").addClass("nova").find("input[name=nome]").focus();
+						//novaLinha.find("#excluirDep").css("display", "inline-block");
+						
+						novaLinha.insertBefore(".fim");
+						
+						novaLinha.find(".campoNomeFilho").val("${filho.nome}");
+						novaLinha.find(".campoNomeFilho").val('<fmt:formatDate value="${filho.dataNascimento}" pattern="dd/MM/yyyy"/>');
+					}
+				</c:forEach>
+			}
+			
 			if($("#campoCargo").val() != "Professor"){
 				$("#campoDisciplina").closest(".campo").hide();
 			} else {

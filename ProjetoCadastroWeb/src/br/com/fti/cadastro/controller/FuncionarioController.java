@@ -3,6 +3,9 @@ package br.com.fti.cadastro.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +14,11 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import br.com.fti.cadastro.dao.FuncionarioDAO;
+import br.com.fti.cadastro.model.Aluno;
 import br.com.fti.cadastro.model.Filho;
 import br.com.fti.cadastro.model.Funcionario;
 import br.com.fti.cadastro.model.Pessoa;
@@ -39,6 +44,18 @@ public class FuncionarioController {
 		model.addAttribute("funcionarios", dao.listaFuncionario());
 		
 		return "funcionarios/lista";
+	}
+	
+	@RequestMapping("editarFuncionario")
+	public String editar(@RequestParam String cadastro, Model model){
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("alunos");
+    	EntityManager manager = factory.createEntityManager();
+    	
+    	model.addAttribute("funcionario", manager.find(Funcionario.class, Long.parseLong(cadastro)));
+    	
+    	manager.close();
+	    factory.close();
+    	return "funcionarios/formulario";
 	}
 	
 	@RequestMapping("funcionarioCadastrado")
@@ -110,9 +127,9 @@ public class FuncionarioController {
 	}
 	
 	@RequestMapping(value="getListaDependentes", method=RequestMethod.GET, produces="application/json")
-	public @ResponseBody List<Pessoa> getListaDependentes(String cadastro) {
+	public @ResponseBody List<Filho> getListaDependentes(String cadastro) {
 		System.out.println(cadastro);
-		List<Pessoa> list = dao.consultarFilhos(Long.parseLong(cadastro));
+		List<Filho> list = dao.consultarFilhos(Long.parseLong(cadastro));
 		return list;
 	}
 	

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import br.com.fti.cadastro.controller.UtilController;
 import br.com.fti.cadastro.model.Aluno;
+import br.com.fti.cadastro.model.Filho;
 import br.com.fti.cadastro.model.Funcionario;
 import br.com.fti.cadastro.model.Pessoa;
 import br.com.fti.cadastro.model.Professor;
@@ -101,7 +102,7 @@ public class FuncionarioDAO {
 
 			PreparedStatement stmt = con.prepareStatement(sql);
 			
-			for (Pessoa filho : funcionario.getListaFilhos()) {
+			for (Filho filho : funcionario.getListaFilhos()) {
 				java.sql.Date d = new java.sql.Date(filho.getDataNascimento().getTime());
 				
 				stmt.setLong(1, funcionario.getCadastro());
@@ -122,8 +123,8 @@ public class FuncionarioDAO {
 		}
 	}
 	
-	public ArrayList<Pessoa> consultarFilhos(Long cadastro){
-		ArrayList<Pessoa> listaFilhos = new ArrayList<Pessoa>();
+	public ArrayList<Filho> consultarFilhos(Long cadastro){
+		ArrayList<Filho> listaFilhos = new ArrayList<Filho>();
 		
 		String sql = "SELECT nome, datanascimento FROM filhos WHERE fk_codigo = ?;";
 		
@@ -135,7 +136,7 @@ public class FuncionarioDAO {
 			ResultSet rs = stmt.executeQuery();
 			
 			while(rs.next()){
-				Pessoa filho = new Pessoa();
+				Filho filho = new Filho();
 				
 				filho.setNome(rs.getString(1));
 				filho.setDataNascimento(rs.getDate(2));
@@ -201,12 +202,12 @@ public class FuncionarioDAO {
 			ResultSet rs = stmt.executeQuery();
 			
 			Funcionario func = new Funcionario();
-			ArrayList<Pessoa> arrayFilhos = new ArrayList<Pessoa>();
+			ArrayList<Filho> arrayFilhos = new ArrayList<Filho>();
 			codigoAtual = 0;
 			
 			while (rs.next()) {
 				if (codigoAtual == rs.getInt(1)) {
-					Pessoa filho = new Pessoa();
+					Filho filho = new Filho();
 					filho.setNome(rs.getString(16));
 					filho.setDataNascimento(new Date(rs.getTimestamp("FILHO.datanascimento").getTime()));
 					arrayFilhos.add(filho);
@@ -239,10 +240,10 @@ public class FuncionarioDAO {
 					func.setEmail(rs.getString(14));
 					func.setFilhos(rs.getInt(15));
 					
-					arrayFilhos = new ArrayList<Pessoa>();
+					arrayFilhos = new ArrayList<Filho>();
 					
 					if (func.getFilhos() > 0) {
-						Pessoa filho = new Pessoa();
+						Filho filho = new Filho();
 						filho.setNome(rs.getString(16));
 						filho.setDataNascimento(new Date(rs.getTimestamp("FILHO.datanascimento").getTime()));
 						arrayFilhos.add(filho);

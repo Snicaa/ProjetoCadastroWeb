@@ -3,6 +3,8 @@ package br.com.fti.cadastro.controller;
 import br.com.fti.cadastro.dao.AlunoDAO;
 import br.com.fti.cadastro.model.Aluno;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -26,23 +28,25 @@ public class AlunoController {
 	}
 	
 	@RequestMapping("cadastrarAluno")
-	public String form(@RequestParam String matricula, Model model) {
-		if (matricula != null && !matricula.equals("")) {
-	    	EntityManagerFactory factory = Persistence.createEntityManagerFactory("alunos");
-	    	EntityManager manager = factory.createEntityManager();
-	    	
-	    	model.addAttribute("aluno", manager.find(Aluno.class, Long.parseLong(matricula)));
-	    	
-	    	manager.close();
-		    factory.close();
-	    	return "alunos/formulario";
-		} else {
-			Aluno aluno = new Aluno();
-			aluno.setMatricula((long)0);
-			model.addAttribute("aluno", aluno);
-		}
-		
+	public String form(Model model) {
+		Aluno aluno = new Aluno();
+		aluno.setMatricula((long)0);
+		model.addAttribute("aluno", aluno);
+
 		return "alunos/formulario";
+	}
+	
+	@RequestMapping("editarAluno")
+	public String editar(@RequestParam String matricula, Model model){
+		
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("alunos");
+    	EntityManager manager = factory.createEntityManager();
+    	
+    	model.addAttribute("aluno", manager.find(Aluno.class, Long.parseLong(matricula)));
+    	
+    	manager.close();
+	    factory.close();
+    	return "alunos/formulario";
 	}
 	
 	@RequestMapping("alunoCadastrado")
@@ -59,9 +63,18 @@ public class AlunoController {
 		}
 		
 		if(aluno.getMatricula() > 0){
-			dao.alterarAluno(aluno);
-			model.addAttribute("alunos", dao.consultarListaAluno());
-			return "alunos/listaAlunos";
+			aluno.setAtivo(1);
+			EntityManagerFactory factory = Persistence.createEntityManagerFactory("alunos");
+	    	EntityManager manager = factory.createEntityManager();
+	    	
+	    	manager.getTransaction().begin();
+	    	manager.merge(aluno);
+	    	manager.getTransaction().commit();
+	    	
+	    	manager.close();
+		    factory.close();
+
+			return "redirect:listaAlunos";
 		}
 		
 		aluno.setMatricula(null);
@@ -73,36 +86,48 @@ public class AlunoController {
 		manager.getTransaction().begin();
 		manager.persist(aluno);
 		manager.getTransaction().commit();
-		
+				
 		manager.close();
 		factory.close();
 		
-		model.addAttribute("alunos", dao.consultarListaAluno());
-		return "alunos/lista";
+		return "redirect:listaAlunos";
 	}
 	
 	@RequestMapping("listaAlunos")
 	public String lista(Model model) {
-		model.addAttribute("alunos", dao.consultarListaAluno());
+		
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("alunos");
+		EntityManager manager = factory.createEntityManager();
+		
+		@SuppressWarnings("unchecked")
+		List<Aluno> lista = manager.createQuery("SELECT a FROM Aluno a WHERE a.ativo = 1 ORDER BY a.matricula ASC").getResultList();
+		
+		manager.close();
+	    factory.close();
+	    
+		model.addAttribute("alunos", lista);
 		
 		return "alunos/lista";
 	}
 	
 	@RequestMapping("removeAluno")
-	public String remove(Aluno aluno) {
-		dao.inativarAluno(aluno.getMatricula());
+	public String remove(@RequestParam String matricula) {
+		
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("alunos");
+    	EntityManager manager = factory.createEntityManager();
+    	
+    	Aluno aluno = manager.find(Aluno.class, Long.parseLong(matricula));
+    			
+    	aluno.setAtivo(0);
+    	
+    	manager.getTransaction().begin();
+    	manager.merge(aluno);
+    	manager.getTransaction().commit();
+    	
+    	manager.close();
+	    factory.close();
+
 		return "redirect:listaAlunos";
 	}
-	
-	@RequestMapping("mostraAluno")
-	public String mostra(Long matricula, Model model) {
-		model.addAttribute("aluno", dao.consultarPorMatricula(matricula));
-		return "alunos/formulario";
-	}
-	
-	@RequestMapping("alteraAluno")
-	public String altera(Aluno aluno) {
-		dao.alterarAluno(aluno);
-		return "alunos/listaAlunos";
-	}
+
 }

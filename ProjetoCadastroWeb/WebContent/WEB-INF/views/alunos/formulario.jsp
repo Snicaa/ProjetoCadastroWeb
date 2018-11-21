@@ -16,8 +16,7 @@
 		<div>
 			<form:errors path="*" cssStyle="color:red"/>
 				<form id="formAluno" name="alunoCadastro" action="alunoCadastrado" method="post">
-					<input id="matricula" type="hidden" name ="matricula" value="${aluno.matricula}"/>
-					
+					<input id="matricula" type="hidden" name="matricula" value="${aluno.matricula}"/>
 					<div class="campo">
 						<label for ="nome">Nome*:</label>
 						<input id="campoNome" type="text" min-length="5" name="nome" placeholder="" required value="${aluno.nome}" />

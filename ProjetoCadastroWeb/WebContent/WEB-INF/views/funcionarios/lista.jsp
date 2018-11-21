@@ -57,7 +57,7 @@
 							<td>${funcionario.cargo}</td>
 							<td>${funcionario.telefoneFormatado}</td>
 							<td>${funcionario.email}</td>
-							<td style="display: flex-box; flex-orientation: row;"><a href="mostraAluno?matricula=${funcionario.cadastro}"><i style="color: black; margin-left:2%;" class="material-icons">create</i></a> &nbsp
+							<td style="display: flex-box; flex-orientation: row;"><a href="editarFuncionario?cadastro=${funcionario.cadastro}"><i style="color: black; margin-left:2%;" class="material-icons">create</i></a> &nbsp
 							<a href="removeTarefa?id=${funcionario.cadastro}"><i style="color: black;" class="material-icons">delete</i></a></td>
 						</tr>
 						<tr id="funcionario_${funcionario.cadastro}" class="auxTr">

@@ -18,7 +18,9 @@ public class Aluno extends Pessoa {
 	@NotNull
 	@Size(min=1, max=30)
 	private String curso;
-
+	
+	private int ativo;
+	
 	public Long getMatricula() {
 		return matricula;
 	}
@@ -34,4 +36,13 @@ public class Aluno extends Pessoa {
 	public void setCurso(String curso) {
 		this.curso = curso;
 	}
+
+	public int getAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(int ativo) {
+		this.ativo = ativo;
+	}
+	
 }

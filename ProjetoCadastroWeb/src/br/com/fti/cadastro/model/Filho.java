@@ -26,7 +26,7 @@ public class Filho {
 	private int id;
 	
 	@ManyToOne
-	@JoinColumn(name="fk_cod_cadastro")
+	@JoinColumn(name="fk_cadastro")
 	private Funcionario funcionario;
 	
 	@NotNull

@@ -13,6 +13,7 @@
 	<body>
 		<h1>Lista de Alunos</h1>
 		<main>
+		<fmt:setLocale value="pt_BR"/>
 			<table>
 				<thead>
 					<tr>
@@ -58,13 +59,14 @@
 							<td>${aluno.curso}</td>
 							<td>${aluno.telefoneFormatado}</td>
 							<td>${aluno.email}</td>
-							<td style="display: flex-box; flex-orientation: row;"><a href="cadastrarAluno?matricula=${aluno.matricula}"><i style="color: black; margin-left:2%;" class="material-icons">create</i></a> &nbsp
-							<a href="removeTarefa?id=${aluno.matricula}"><i style="color: black;" class="material-icons">delete</i></a></td>
+							<td style="display: flex-box; flex-orientation: row;"><a href="editarAluno?matricula=${aluno.matricula}"><i style="color: black; margin-left:2%;" class="material-icons">create</i></a> &nbsp
+							<a href="removeAluno?matricula=${aluno.matricula}"><i style="color: black;" class="material-icons">delete</i></a></td>
 						</tr>
 					</c:forEach>
 				</tbody>
 			</table>
 		</main>
+		
 	</body>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 

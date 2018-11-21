@@ -32,7 +32,7 @@ public class UtilController {
 	
 	@RequestMapping("validaData")
 	public @ResponseBody String data(String data){
-		if(UtilController.validaData(data)){
+		if(UtilController.validaDataNascimento(data)){
 			return "";
 		}
 		return "Data inválida";
@@ -86,7 +86,7 @@ public class UtilController {
 		return verifica;
 	}
 	
-	public static boolean validaData(String data){
+	public static boolean validaDataNascimento(String data){
 		boolean valida = false;
 		UtilController.sdf.setLenient(false);
 		try {
@@ -144,7 +144,7 @@ public class UtilController {
 	
 	public static String removeMascaraDinheiro(String dinheiro){
 		dinheiro = dinheiro.replace("R$ ", "");
-		dinheiro = dinheiro.replace(".", "");
+		dinheiro = dinheiro.replaceAll("[.]", "");
 		dinheiro = dinheiro.replace(",", ".");
 		
 		return dinheiro;
