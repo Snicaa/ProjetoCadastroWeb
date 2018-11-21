@@ -13,11 +13,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class AlunoController {
-	EntityManagerFactory factory = Persistence.createEntityManagerFactory("alunos");
-	EntityManager manager = factory.createEntityManager();
 	
 	private final AlunoDAO dao;
 	
@@ -27,12 +26,21 @@ public class AlunoController {
 	}
 	
 	@RequestMapping("cadastrarAluno")
-	public String form(Model model) {
-		Aluno aluno = new Aluno();	
-		
-		aluno.setMatricula((long)0);
-		
-		model.addAttribute("aluno", aluno);
+	public String form(@RequestParam String matricula, Model model) {
+		if (matricula != null && !matricula.equals("")) {
+	    	EntityManagerFactory factory = Persistence.createEntityManagerFactory("alunos");
+	    	EntityManager manager = factory.createEntityManager();
+	    	
+	    	model.addAttribute("aluno", manager.find(Aluno.class, Long.parseLong(matricula)));
+	    	
+	    	manager.close();
+		    factory.close();
+	    	return "alunos/formulario";
+		} else {
+			Aluno aluno = new Aluno();
+			aluno.setMatricula((long)0);
+			model.addAttribute("aluno", aluno);
+		}
 		
 		return "alunos/formulario";
 	}
@@ -58,6 +66,9 @@ public class AlunoController {
 		
 		aluno.setMatricula(null);
 		aluno.setAtivo(1);
+		
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("alunos");
+		EntityManager manager = factory.createEntityManager();
 		
 		manager.getTransaction().begin();
 		manager.persist(aluno);

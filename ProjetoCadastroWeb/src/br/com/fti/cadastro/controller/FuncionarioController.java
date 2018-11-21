@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import br.com.fti.cadastro.dao.FuncionarioDAO;
+import br.com.fti.cadastro.model.Filho;
 import br.com.fti.cadastro.model.Funcionario;
 import br.com.fti.cadastro.model.Pessoa;
 import br.com.fti.cadastro.model.Professor;
@@ -69,11 +70,11 @@ public class FuncionarioController {
 		return "funcionarios/lista";
 	}
 	
-	public static ArrayList<Pessoa> geraListaFilhos(String[] nomeFilho, String[] dataFilho){
-		ArrayList<Pessoa> listaFilhos = new ArrayList<Pessoa>();
+	public static List<Filho> geraListaFilhos(String[] nomeFilho, String[] dataFilho){
+		List<Filho> listaFilhos = new ArrayList<Filho>();
 		
 		for(int i = 0; i < nomeFilho.length; i++){
-			Pessoa filho = new Pessoa();
+			Filho filho = new Filho();
 			filho.setNome(nomeFilho[i]);
 			filho.setDataNascimento(UtilController.converteStringEmData(dataFilho[i]));
 			

@@ -2,15 +2,29 @@ package br.com.fti.cadastro.model;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 
 import br.com.fti.cadastro.controller.UtilController;
 
+@Entity
+@Table(name = "funcionarios")
 public class Funcionario extends Pessoa {
 	
 	@NotNull
+	@Id
+	@GeneratedValue
 	private Long cadastro;
 	
 	@NotNull
@@ -21,12 +35,22 @@ public class Funcionario extends Pessoa {
 	private BigDecimal salario;
 	
 	@Digits(integer=12, fraction=2)
-	BigDecimal valeAlimentacao, valeTransporte, valeRefeicao;
+	@Column(name="vale_alimentacao")
+	BigDecimal valeAlimentacao;
+	
+	@Digits(integer=12, fraction=2)
+	@Column(name="vale_transporte")
+	BigDecimal valeTransporte;
+	
+	@Digits(integer=12, fraction=2)
+	@Column(name="vale_refeicao")
+	BigDecimal valeRefeicao;
 	
 	@NotNull
 	private int filhos;
 	
-	private ArrayList<Pessoa> listaFilhos;
+	@OneToMany(mappedBy = "funcionario", targetEntity = Filho.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<Filho> listaFilhos;
 	
 	public Long getCadastro() {
 		return cadastro;
@@ -112,11 +136,11 @@ public class Funcionario extends Pessoa {
 		this.filhos = filhos;
 	}
 	
-	public ArrayList<Pessoa> getListaFilhos() {
+	public List<Filho> getListaFilhos() {
 		return listaFilhos;
 	}
 	
-	public void setListaFilhos(ArrayList<Pessoa> listaFilhos) {
+	public void setListaFilhos(List<Filho> listaFilhos) {
 		this.listaFilhos = listaFilhos;
 	}
 

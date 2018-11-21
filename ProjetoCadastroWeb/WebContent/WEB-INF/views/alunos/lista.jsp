@@ -58,7 +58,7 @@
 							<td>${aluno.curso}</td>
 							<td>${aluno.telefoneFormatado}</td>
 							<td>${aluno.email}</td>
-							<td style="display: flex-box; flex-orientation: row;"><a href="mostraAluno?matricula=${aluno.matricula}"><i style="color: black; margin-left:2%;" class="material-icons">create</i></a> &nbsp
+							<td style="display: flex-box; flex-orientation: row;"><a href="cadastrarAluno?matricula=${aluno.matricula}"><i style="color: black; margin-left:2%;" class="material-icons">create</i></a> &nbsp
 							<a href="removeTarefa?id=${aluno.matricula}"><i style="color: black;" class="material-icons">delete</i></a></td>
 						</tr>
 					</c:forEach>
