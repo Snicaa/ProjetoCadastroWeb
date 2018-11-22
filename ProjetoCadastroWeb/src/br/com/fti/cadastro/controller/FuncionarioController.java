@@ -1,11 +1,13 @@
 package br.com.fti.cadastro.controller;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import br.com.fti.cadastro.dao.FuncionarioDAO;
-import br.com.fti.cadastro.model.Aluno;
 import br.com.fti.cadastro.model.Filho;
 import br.com.fti.cadastro.model.Funcionario;
-import br.com.fti.cadastro.model.Pessoa;
-import br.com.fti.cadastro.model.Professor;
 
 @Controller
 public class FuncionarioController {
@@ -41,17 +40,29 @@ public class FuncionarioController {
 	
 	@RequestMapping("listaFuncionarios")
 	public String lista(Model model) {
-		model.addAttribute("funcionarios", dao.listaFuncionario());
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("funcionarios");
+		EntityManager manager = factory.createEntityManager();
+		
+		@SuppressWarnings("unchecked")
+		List<Funcionario> lista = manager.createQuery("SELECT f FROM Funcionario f WHERE f.ativo = 1 ORDER BY f.cadastro ASC").getResultList();
+		
+		manager.close();
+	    factory.close();
+	    
+		model.addAttribute("funcionarios", lista);
 		
 		return "funcionarios/lista";
 	}
 	
 	@RequestMapping("editarFuncionario")
 	public String editar(@RequestParam String cadastro, Model model){
-		EntityManagerFactory factory = Persistence.createEntityManagerFactory("alunos");
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("funcionarios");
     	EntityManager manager = factory.createEntityManager();
     	
-    	model.addAttribute("funcionario", manager.find(Funcionario.class, Long.parseLong(cadastro)));
+    	Funcionario func = manager.find(Funcionario.class, Long.parseLong(cadastro));
+    	
+    	model.addAttribute("funcionario", func);
+    	model.addAttribute("filhos", func.getListaFilhos());
     	
     	manager.close();
 	    factory.close();
@@ -59,7 +70,7 @@ public class FuncionarioController {
 	}
 	
 	@RequestMapping("funcionarioCadastrado")
-	public String adiciona(@Valid Funcionario funcionario, BindingResult result, String disciplina, String[] nomeFilho, String[] dataFilho, Model model) {
+	public String adiciona(@Valid Funcionario funcionario, BindingResult result, String[] nomeFilho, String[] dataFilho, Model model) {
 		
 		model.addAttribute("funcionario", funcionario);
 		
@@ -75,16 +86,52 @@ public class FuncionarioController {
 			funcionario.setListaFilhos(FuncionarioController.geraListaFilhos(nomeFilho, dataFilho));
 		}
 		
-		if (disciplina != null && !disciplina.equals("")){
-			funcionario = instanciaProfessor(funcionario, disciplina);
+		if (funcionario.getValeAlimentacao() == null){
+			funcionario.setValeAlimentacao("0");
+		}
+		
+		if (funcionario.getValeRefeicao() == null){
+			funcionario.setValeRefeicao("0");
+		}
+		
+		if (funcionario.getValeTransporte() == null){
+			funcionario.setValeTransporte("0");
+		}
+		
+		if(!funcionario.getCargo().equals("Professor")){
+			funcionario.setDisciplina(null);
 		}
 		
 		if(funcionario.getCadastro() > 0){
-			dao.alterarFuncionario(funcionario);
-			return "funcionarios/listaFuncionarios";
+			funcionario.setAtivo(1);
+			
+			EntityManagerFactory factory = Persistence.createEntityManagerFactory("funcionarios");
+	    	EntityManager manager = factory.createEntityManager();
+	    	
+	    	manager.getTransaction().begin();
+	    	manager.merge(funcionario);
+	    	manager.getTransaction().commit();
+	    	
+	    	manager.close();
+		    factory.close();
+
+			return "redirect:listaFuncionarios";
 		}
-		dao.cadastrarFuncionario(funcionario);
-		return "funcionarios/lista";
+
+		funcionario.setCadastro(null);
+		funcionario.setAtivo(1);
+		
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("funcionarios");
+		EntityManager manager = factory.createEntityManager();
+		
+		manager.getTransaction().begin();
+		manager.persist(funcionario);
+		manager.getTransaction().commit();
+				
+		manager.close();
+		factory.close();
+		
+		return "redirect:listaFuncionarios";
 	}
 	
 	public static List<Filho> geraListaFilhos(String[] nomeFilho, String[] dataFilho){
@@ -101,35 +148,20 @@ public class FuncionarioController {
 		return listaFilhos;
 	}
 	
-	private Professor instanciaProfessor(Funcionario func, String disciplina){
-		Professor prof = new Professor();
-		
-		prof.setCadastro(func.getCadastro());
-		prof.setNome(func.getNome());
-		prof.setCpf(func.getCpf());
-		prof.setDataNascimento(func.getDataNascimento());
-		prof.setSexo(func.getSexo());
-		prof.setEndereco(func.getEndereco());
-		prof.setEmail(func.getEmail());
-		prof.setTelefone(func.getTelefone());
-		
-		prof.setCargo(func.getCargo());
-		prof.setDisciplina(disciplina);
-		
-		prof.setSalario(func.getSalario().toString());
-		prof.setValeAlimentacao(func.getValeAlimentacao().toString());
-		prof.setValeRefeicao(func.getValeRefeicao().toString());
-		prof.setValeTransporte(func.getValeTransporte().toString());
-		prof.setFilhos(func.getFilhos());
-		prof.setListaFilhos(func.getListaFilhos());
-		
-		return prof;
-	}
-	
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value="getListaDependentes", method=RequestMethod.GET, produces="application/json")
 	public @ResponseBody List<Filho> getListaDependentes(String cadastro) {
-		System.out.println(cadastro);
-		List<Filho> list = dao.consultarFilhos(Long.parseLong(cadastro));
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("funcionarios");
+    	EntityManager manager = factory.createEntityManager();
+		
+    	Query query = manager.createQuery("SELECT f FROM Filho as f WHERE f.funcionario.cadastro = :cadastro ORDER BY f.id ASC");
+    	query.setParameter("cadastro", Long.parseLong(cadastro));
+    	
+		List<Filho> list = query.getResultList();
+		
+		manager.close();
+	    factory.close();
+	    
 		return list;
 	}
 	

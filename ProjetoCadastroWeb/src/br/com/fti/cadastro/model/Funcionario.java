@@ -25,10 +25,13 @@ public class Funcionario extends Pessoa {
 	@NotNull
 	@Id
 	@GeneratedValue
+	@Column(name="codigo")
 	private Long cadastro;
 	
 	@NotNull
 	private String cargo;
+	
+	private String disciplina;
 	
 	@NotNull
 	@Digits(integer=12, fraction=2)
@@ -47,6 +50,7 @@ public class Funcionario extends Pessoa {
 	BigDecimal valeRefeicao;
 	
 	@NotNull
+	@Column(name="numero_filhos")
 	private int filhos;
 	
 	@OneToMany(mappedBy = "funcionario", targetEntity = Filho.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -142,6 +146,14 @@ public class Funcionario extends Pessoa {
 	
 	public void setListaFilhos(List<Filho> listaFilhos) {
 		this.listaFilhos = listaFilhos;
+	}
+
+	public String getDisciplina() {
+		return disciplina;
+	}
+
+	public void setDisciplina(String disciplina) {
+		this.disciplina = disciplina;
 	}
 
 }
