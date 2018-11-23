@@ -21,7 +21,7 @@
 					<div class="campo">
 						<label for ="nome">Nome*:</label>
 						<input id="campoNome" type="text" min-length="5" name="nome" placeholder="" required value="${funcionario.nome}" />
-						<span class="validacao"></span><br/>
+						<span class="validacao temErro"></span><br/>
 					</div>
 					
 					<div class="campo">
@@ -173,7 +173,7 @@
 	     				<div class="fim"></div>
 					</div>
 					<input id="resetar" type="reset"/ value="Limpar">
-				 	<input id="adicionar" class="button" type="submit" value="${funcionario.cadastro gt 0 ? 'Alterar' : 'Cadastrar'}"/>
+				 	<input id="adicionar" class="button" type="submit" value="${funcionario.cadastro gt 0 ? 'Alterar' : 'Cadastrar'}" disabled/>
 				</form>
 			</div>
 		</body>
@@ -194,13 +194,13 @@
 			if (numFilhos > 0) {
 				<c:forEach items="${filhos}" var="filho">
 					if (pv) {
+						$(".formularioFilho").removeAttr("hidden", "hidden");
 						$(".campoNomeFilho").val("${filho.nome}");
 						$(".campoDataFilho").val('<fmt:formatDate value="${filho.dataNascimento}" pattern="dd/MM/yyyy"/>');
 						pv = false;
 					} else {
 						var novaLinha = $(".formularioFilho").clone();
 						novaLinha.removeClass("formularioFilho").addClass("nova").find("input[name=nome]").focus();
-						//novaLinha.find("#excluirDep").css("display", "inline-block");
 						
 						novaLinha.insertBefore(".fim");
 						
@@ -318,10 +318,13 @@
 			});
 			
 			$("#campoSalario").blur(function(){
-				//FAZERAQUI
-			})
-			
-			$(form).hasClass("temErro");
+				if($(this).val() == "R$ 0,00"){
+					$(this).closest(".campo").find(".validacao").html("Insira um salário").addClass("temErro");
+				} else {
+					$(this).closest(".campo").find(".validacao").html("").removeClass("temErro");
+					$("#adicionar").attr("title", erros);
+				}
+			});
 			
 			$("#addFilhos").click(function(){
 				
@@ -342,7 +345,8 @@
 					if($(novaLinha)[0].hasAttribute("hidden")){
 						novaLinha.removeAttr("hidden", "hidden");
 					}
-					
+					novaLinha.find(".campoNomeFilho").val("");
+					novaLinha.find(".campoDataFilho").val("");
 					novaLinha.removeClass("formularioFilho").addClass("nova").find("input[name=nomeFilho]").focus();
 					
 					novaLinha.find(".esconder").removeClass("esconder");
@@ -370,7 +374,7 @@
 		});
 		
 		function erros(){
-			if ($("#formFuncionario").hasClass("temErro")){
+			if ($(".temErro").length > 0){
 				$("#adicionar").attr("disabled", "disabled");
 			} else {
 				$("#adicionar").removeAttr("disabled", "disabled");
@@ -438,7 +442,7 @@
 			$(elemento).closest(".nova").remove();
 			numFilhos = numFilhos - 1;
 			$("#campoFilhos").val(numFilhos);
-		}
+		};
 		</script>
 </html>
 

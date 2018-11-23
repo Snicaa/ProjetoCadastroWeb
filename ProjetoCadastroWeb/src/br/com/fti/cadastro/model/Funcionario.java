@@ -22,7 +22,6 @@ import br.com.fti.cadastro.controller.UtilController;
 @Table(name = "funcionarios")
 public class Funcionario extends Pessoa {
 	
-	@NotNull
 	@Id
 	@GeneratedValue
 	@Column(name="codigo")
@@ -34,22 +33,17 @@ public class Funcionario extends Pessoa {
 	private String disciplina;
 	
 	@NotNull
-	@Digits(integer=12, fraction=2)
 	private BigDecimal salario;
 	
-	@Digits(integer=12, fraction=2)
 	@Column(name="vale_alimentacao")
 	BigDecimal valeAlimentacao;
 	
-	@Digits(integer=12, fraction=2)
 	@Column(name="vale_transporte")
 	BigDecimal valeTransporte;
 	
-	@Digits(integer=12, fraction=2)
 	@Column(name="vale_refeicao")
 	BigDecimal valeRefeicao;
 	
-	@NotNull
 	@Column(name="numero_filhos")
 	private int filhos;
 	

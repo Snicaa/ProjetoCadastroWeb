@@ -1,6 +1,5 @@
 package br.com.fti.cadastro.controller;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +43,7 @@ public class FuncionarioController {
 		EntityManager manager = factory.createEntityManager();
 		
 		@SuppressWarnings("unchecked")
-		List<Funcionario> lista = manager.createQuery("SELECT f FROM Funcionario f WHERE f.ativo = 1 ORDER BY f.cadastro ASC").getResultList();
+		List<Funcionario> lista = manager.createQuery("SELECT f FROM Funcionario as f WHERE f.ativo = 1 ORDER BY f.cadastro ASC").getResultList();
 		
 		manager.close();
 	    factory.close();
@@ -54,6 +53,7 @@ public class FuncionarioController {
 		return "funcionarios/lista";
 	}
 	
+	@SuppressWarnings("unchecked")
 	@RequestMapping("editarFuncionario")
 	public String editar(@RequestParam String cadastro, Model model){
 		EntityManagerFactory factory = Persistence.createEntityManagerFactory("funcionarios");
@@ -61,8 +61,13 @@ public class FuncionarioController {
     	
     	Funcionario func = manager.find(Funcionario.class, Long.parseLong(cadastro));
     	
+    	Query query = manager.createQuery("SELECT f FROM Filho as f WHERE f.funcionario.cadastro = :cadastro ORDER BY f.id ASC");
+    	query.setParameter("cadastro", Long.parseLong(cadastro));
+    	
+		List<Filho> lista = query.getResultList();
+    	
     	model.addAttribute("funcionario", func);
-    	model.addAttribute("filhos", func.getListaFilhos());
+    	model.addAttribute("filhos", lista);
     	
     	manager.close();
 	    factory.close();
@@ -70,19 +75,17 @@ public class FuncionarioController {
 	}
 	
 	@RequestMapping("funcionarioCadastrado")
-	public String adiciona(@Valid Funcionario funcionario, BindingResult result, String[] nomeFilho, String[] dataFilho, Model model) {
-		
-		model.addAttribute("funcionario", funcionario);
-		
+	public String adiciona(Funcionario funcionario, BindingResult result, String[] nomeFilho, String[] dataFilho, Model model) {
+		/*
 		if(result.hasFieldErrors()){
 			return"funcionarios/formulario";
 		}
-		
+		*/
 		if(!UtilController.validaCpf(funcionario.getCpf())){
 			return "funcionarios/formulario";
 		}
 		
-		if (!nomeFilho[0].equals("")){
+		if (nomeFilho != null && !nomeFilho[0].equals("")){
 			funcionario.setListaFilhos(FuncionarioController.geraListaFilhos(nomeFilho, dataFilho));
 		}
 		
