@@ -137,6 +137,7 @@
 						<label for="salario">Salário*:</label>
 						<input id="campoSalario" class="dinheiro" type="text" name="salario" value="${funcionario.salarioFormatado}" placeholder="R$ 0,00" required
 						prefix="R$ " thousands="." decimal=",">
+						<span class="validacao"></span><br/>
 					</div>
 					
 					<div class="campo">
@@ -151,7 +152,7 @@
 					
 					<div class="campo">
 						<label for="valeTransporte">Vale Transporte:</label>
-						<input id="campoTransporte" class="dinheiro" type="text" name="valeTrasporte" value="${funcionario.valeAlimentacaoFormatado}" placeholder="R$ 0,00">
+						<input id="campoTransporte" class="dinheiro" type="text" name="valeTrasporte" value="${funcionario.valeTransporteFormatado}" placeholder="R$ 0,00">
 					</div>
 					
 					<br>
@@ -168,11 +169,13 @@
 				                <label for="dataFilho">Data de Nascimento*:</label>
 				                <input type="text" name="dataFilho" class="campoDataFilho" placeholder="__/__/____" />
 								<span style="cursor: pointer;" class="esconder spanExcluir" onclick="excluirLinha(this)" ><i style="color: black;" class="material-icons">delete</i></span>
+								<span class="validacao"></span>
+								<span class="validacaoData"></span>
 							</div>							
 	     				</div>
 	     				<div class="fim"></div>
 					</div>
-					<input id="resetar" type="reset"/ value="Limpar">
+					<input id="resetar" type="reset" value="Limpar"/>
 				 	<input id="adicionar" class="button" type="submit" value="${funcionario.cadastro gt 0 ? 'Alterar' : 'Cadastrar'}" disabled/>
 				</form>
 			</div>
@@ -200,12 +203,12 @@
 						pv = false;
 					} else {
 						var novaLinha = $(".formularioFilho").clone();
-						novaLinha.removeClass("formularioFilho").addClass("nova").find("input[name=nome]").focus();
+						novaLinha.removeClass("formularioFilho").addClass("nova").find("input[name=nomeFilho]").focus();
 						
 						novaLinha.insertBefore(".fim");
 						
 						novaLinha.find(".campoNomeFilho").val("${filho.nome}");
-						novaLinha.find(".campoNomeFilho").val('<fmt:formatDate value="${filho.dataNascimento}" pattern="dd/MM/yyyy"/>');
+						novaLinha.find(".campoDataFilho").val('<fmt:formatDate value="${filho.dataNascimento}" pattern="dd/MM/yyyy"/>');
 					}
 				</c:forEach>
 			}
@@ -227,43 +230,64 @@
 	        $('#campoData').mask('00/00/0000');
 	        $('#campoTelefone').mask('(00) 0000-0000');
 	        
-	        $("#campoNome").blur(function(){
+	        $("#campoNome").on("change", function(){
 				if($(this).val().length < 5 || $(this).val().length > 30){
-					$(this).closest(".campo").find(".validacao").html("Nome inválido (5 a 50 caracteres)").addClass("temErro");
+					$(this).closest(".campo").find(".validacao").html("").addClass("temErro");
+					if ($(this).val().length != 0){
+						$(this).closest(".campo").find(".validacao").html("Nome inválido (5 a 50 caracteres)");
+					}
+					$("#adicionar").attr("title", erros);
 				} else {
 					$(this).closest(".campo").find(".validacao").html("").removeClass("temErro");
 					$("#adicionar").attr("title", erros);
 				}
 			});
 			
-			$("#campoCpf").blur(function(){
+			$("#campoCpf").on("input", function(){
 				var cpf = $('#campoCpf').val().replace(/[^0-9]/g, '').toString();
-				$.post("validaCpf?cpf=" + cpf, function(resposta){
-					$("#campoCpf").closest(".campo").find(".validacao").html(resposta);
-					if (resposta == ""){
-						$("#campoCpf").closest(".campo").find(".validacao").removeClass("temErro");
-						$("#adicionar").attr("title", erros);
-					} else {
-						$("#campoCpf").closest(".campo").find(".validacao").addClass("temErro");
+				if(cpf.length == 11 || $("#campoCpf").focusout()){
+					$.post("validaCpf?cpf=" + cpf, function(resposta){
+						$("#campoCpf").closest(".campo").find(".validacao").html(resposta);
+						if (resposta == ""){
+							$("#campoCpf").closest(".campo").find(".validacao").removeClass("temErro");
+							$("#adicionar").attr("title", erros);
+						} else {
+							$("#campoCpf").closest(".campo").find(".validacao").addClass("temErro");
+						}
+					})
+				} else {
+					if (cpf.length = 0){
+						$("#campoCpf").closest(".campo").find(".validacao").html("").addClass("temErro");
 					}
-				})
+				}
 			});
 			
-			$("#campoData").blur(function(){
-				$.post("validaData?data=" + $(this).val(), function(resposta){
-					$("#campoData").closest(".campo").find(".validacao").html(resposta);
-					if (resposta == ""){
-						$("#campoData").closest(".campo").find(".validacao").removeClass("temErro");
-						$("#adicionar").attr("title", erros);
+			$("#campoData").on("input", function(){
+				if ($(this).val().length == 11 || $(this).focusout()){
+						$.post("validaData?data=" + $(this).val(), function(resposta){
+							$("#campoData").closest(".campo").find(".validacao").html(resposta);
+							if (resposta == ""){
+								$("#campoData").closest(".campo").find(".validacao").removeClass("temErro");
+							} else {
+								$("#campoData").closest(".campo").find(".validacao").addClass("temErro");
+							}
+							$("#adicionar").attr("title", erros);
+						})
 					} else {
-						$("#campoData").closest(".campo").find(".validacao").addClass("temErro");
+						if ($(this).val().length == 0){
+							$("#campoData").closest(".campo").find(".validacao").html("").addClass("temErro");
+							$("#adicionar").attr("title", erros);
+						}
 					}
-				})
-			});
+				}
+			);
 			
-			$("#campoEndereco").blur(function(){
-				if($(this).val().length < 10 || $(this).val().length > 255){
-					$(this).closest(".campo").find(".validacao").html("Endereço inválido (10 a 255 caracteres)").addClass("temErro");
+			$("#campoEndereco").on("input", function(){
+				if ($(this).val().length < 10 || $(this).val().length > 255){
+					$(this).closest(".campo").find(".validacao").html("").addClass("temErro");
+					if ($(this).val().length != 0){
+						$(this).closest(".campo").find(".validacao").html("Endereço inválido (10 a 255 caracteres)").addClass("temErro");	
+					}
 					$("#adicionar").attr("title", erros);
 				} else {
 					$(this).closest(".campo").find(".validacao").html("").removeClass("temErro");
@@ -271,7 +295,7 @@
 				}
 			});
 			
-			$("#campoCargo").change(function(){
+			$("#campoCargo").on("change", function(){
 				if($("#campoCargo").val() == "Selecionar..."){
 					$(this).closest(".campo").find(".validacao").html("Selecione um cargo").addClass("temErro");
 					$("#adicionar").attr("title", erros);
@@ -288,7 +312,7 @@
 				}
 			});
 			
-			$("#campoDisciplina").change(function(){
+			$("#campoDisciplina").on("change", function(){
 				if($("#campoDisciplina").val() == "Selecionar..."){
 					$(this).closest(".campo").find(".validacao").html("Selecione uma disciplina").addClass("temErro");
 					$("#adicionar").attr("title", erros);
@@ -298,33 +322,66 @@
 				}
 			});
 			
-			$("#campoTelefone").blur(function(){
+			$("#campoTelefone").on("change", function(){
 				if ($(this).val().length < 10 || $(this).val().length > 15){
-					$(this).closest(".campo").find(".validacao").html("Telefone inválido").addClass("temErro");
-					$("#adicionar").attr("title", erros);
+					$(this).closest(".campo").find(".validacao").addClass("temErro");
+					if ($(this).val().length != 0){
+						$(this).closest(".campo").find(".validacao").html("Telefone inválido");
+					}
 				} else {
 					$(this).closest(".campo").find(".validacao").html("").removeClass("temErro");
-					$("#adicionar").attr("title", erros);
 				}
+				$("#adicionar").attr("title", erros);
 			});
 			
-			$("#campoEmail").blur(function(){
+			$("#campoEmail").on("change", function(){
 				if ($(this).val().length < 5 || $(this).val().length > 30 || !$(this).val().includes("@")){
 					$(this).closest(".campo").find(".validacao").html("E-mail inválido").addClass("temErro");
 				} else {
 					$(this).closest(".campo").find(".validacao").html("").removeClass("temErro");
-					$("#adicionar").attr("title", erros);
 				}
+				$("#adicionar").attr("title", erros);
 			});
 			
 			$("#campoSalario").blur(function(){
-				if($(this).val() == "R$ 0,00"){
+				if($("#campoSalario").val() == ""){
 					$(this).closest(".campo").find(".validacao").html("Insira um salário").addClass("temErro");
 				} else {
 					$(this).closest(".campo").find(".validacao").html("").removeClass("temErro");
-					$("#adicionar").attr("title", erros);
 				}
+				$("#adicionar").attr("title", erros);
 			});
+			
+			$(".campoNomeFilho").livequery("input", function(){
+				if ($(this).val().length == 0) {
+					$(this).closest(".campo").find(".validacao").html("").addClass("temErro");
+				} else if ($(this).val().length < 5 || $(this).val().length > 50) {
+					$(this).closest(".campo").find(".validacao").html("Nome inválido").addClass("temErro");
+				} else {
+					$(this).closest(".campo").find(".validacao").html("").removeClass("temErro");
+				}
+				$("#adicionar").attr("title", erros);
+			});
+			
+			$(".campoDataFilho").livequery("input", function(){
+				if ($(this).val().length == 11 || $(this).focusout()){
+						$.post("validaData?data=" + $(this).val(), function(resposta){
+							$(this).closest(".campo").find(".validacaoData").html(resposta);
+							if (resposta == ""){
+								$("#campoDataFilho").closest(".campo").find(".validacaoData").removeClass("temErro");
+							} else {
+								$("#campoDataFilho").closest(".campo").find(".validacaoData").addClass("temErro");
+							}
+							$("#adicionar").attr("title", erros);
+						})
+					} else {
+						if ($(this).val().length == 0){
+							$(this).closest(".campo").find(".validacaoData").html("").addClass("temErro");
+							$("#adicionar").attr("title", erros);
+						}
+					}
+				}
+			);
 			
 			$("#addFilhos").click(function(){
 				
@@ -357,7 +414,7 @@
 				return false;
 				
 				}
-			);	
+			);
 			
 			$(".esconder").click(function(){
 				$(".esconder").closest(".formularioFilho").attr("hidden", "hidden");
@@ -408,16 +465,13 @@
 				stringErros = stringErros + "E-mail inválido\n";
 			}
 			if ($("#campoSalario").closest(".campo").find(".validacao").hasClass("temErro")){
-				stringErros = stringErros + "Salário inválido\n"
+				stringErros = stringErros + "Salário inválido\n";
 			}
-			if ($("#campoAlimentacao").closest(".campo").find(".validacao").hasClass("temErro")){
-				stringErros = stringErros + "Preencha o valor do Vale Alimentação corretamente\n"
+			if ($(".campoNomeFilho").closest(".campo").find(".validacao").hasClass("temErro")){
+				stringErros = stringErros + "Preencha os nomes dos dependentes corretamente\n";
 			}
-			if ($("#campoRefeicao").closest(".campo").find(".validacao").hasClass("temErro")){
-				stringErros = stringErros + "Preencha o valor do Vale Refeição corretamente\n"
-			}
-			if ($("#campoTransporte").closest(".campo").find(".validacao").hasClass("temErro")){
-				stringErros = stringErros + "Preencha o valor do Vale Transporte corretamente\n"
+			if ($(".campoDataFilho").closest(".campo").find(".validacao").hasClass("temErro")){
+				stringErros = stringErros + "Preencha as datas de nascimento dos dependentes corretamente\n";
 			}
 			if (stringErros == ""){
 				stringErros = "Clique para Cadastrar o Funcionário"

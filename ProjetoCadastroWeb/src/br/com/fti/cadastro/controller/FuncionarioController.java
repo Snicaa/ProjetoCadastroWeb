@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import br.com.fti.cadastro.dao.FuncionarioDAO;
+import br.com.fti.cadastro.model.Aluno;
 import br.com.fti.cadastro.model.Filho;
 import br.com.fti.cadastro.model.Funcionario;
 
@@ -43,7 +44,7 @@ public class FuncionarioController {
 		EntityManager manager = factory.createEntityManager();
 		
 		@SuppressWarnings("unchecked")
-		List<Funcionario> lista = manager.createQuery("SELECT f FROM Funcionario as f WHERE f.ativo = 1 ORDER BY f.cadastro ASC").getResultList();
+		List<Funcionario> lista = manager.createQuery("SELECT func FROM Funcionario func WHERE func.ativo = 1 ORDER BY func.cadastro ASC").getResultList();
 		
 		manager.close();
 	    factory.close();
@@ -54,20 +55,36 @@ public class FuncionarioController {
 	}
 	
 	@SuppressWarnings("unchecked")
+	@RequestMapping("listaProfessores")
+	public String listaProfs(Model model) {
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("funcionarios");
+		EntityManager manager = factory.createEntityManager();
+		
+		Query query = manager.createQuery("SELECT func FROM Funcionario func WHERE func.ativo = 1 AND func.cargo = :cargo ORDER BY func.cadastro ASC");
+		query.setParameter("cargo", "Professor");
+		
+		List<Funcionario> lista = query.getResultList();
+		
+		manager.close();
+	    factory.close();
+	    
+		model.addAttribute("funcionarios", lista);
+		
+		return "funcionarios/lista";
+	}
+	
 	@RequestMapping("editarFuncionario")
 	public String editar(@RequestParam String cadastro, Model model){
 		EntityManagerFactory factory = Persistence.createEntityManagerFactory("funcionarios");
     	EntityManager manager = factory.createEntityManager();
-    	
-    	Funcionario func = manager.find(Funcionario.class, Long.parseLong(cadastro));
-    	
-    	Query query = manager.createQuery("SELECT f FROM Filho as f WHERE f.funcionario.cadastro = :cadastro ORDER BY f.id ASC");
+    
+    	Query query = manager.createQuery("SELECT func FROM Funcionario func JOIN FETCH func.listaFilhos f WHERE func.cadastro = :cadastro");
     	query.setParameter("cadastro", Long.parseLong(cadastro));
     	
-		List<Filho> lista = query.getResultList();
+    	Funcionario func = (Funcionario) query.getSingleResult();
     	
     	model.addAttribute("funcionario", func);
-    	model.addAttribute("filhos", lista);
+    	model.addAttribute("filhos", func.getListaFilhos());
     	
     	manager.close();
 	    factory.close();
@@ -85,8 +102,8 @@ public class FuncionarioController {
 			return "funcionarios/formulario";
 		}
 		
-		if (nomeFilho != null && !nomeFilho[0].equals("")){
-			funcionario.setListaFilhos(FuncionarioController.geraListaFilhos(nomeFilho, dataFilho));
+		if (nomeFilho.length != 0){
+			funcionario.setListaFilhos(FuncionarioController.geraListaFilhos(nomeFilho, dataFilho, funcionario));
 		}
 		
 		if (funcionario.getValeAlimentacao() == null){
@@ -105,13 +122,18 @@ public class FuncionarioController {
 			funcionario.setDisciplina(null);
 		}
 		
-		if(funcionario.getCadastro() > 0){
+		if(funcionario.getCadastro() != null){
 			funcionario.setAtivo(1);
 			
 			EntityManagerFactory factory = Persistence.createEntityManagerFactory("funcionarios");
 	    	EntityManager manager = factory.createEntityManager();
 	    	
 	    	manager.getTransaction().begin();
+	    	
+	    	Query query = manager.createQuery("DELETE from Filho f WHERE f.funcionario.cadastro = :id");
+			query.setParameter("id", funcionario.getCadastro());
+	    	query.executeUpdate();
+	    	
 	    	manager.merge(funcionario);
 	    	manager.getTransaction().commit();
 	    	
@@ -137,13 +159,33 @@ public class FuncionarioController {
 		return "redirect:listaFuncionarios";
 	}
 	
-	public static List<Filho> geraListaFilhos(String[] nomeFilho, String[] dataFilho){
+	@RequestMapping("removeFuncionario")
+	public static String remove(@RequestParam String cadastro) {
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("funcionarios");
+    	EntityManager manager = factory.createEntityManager();
+    	
+    	Funcionario func = manager.find(Funcionario.class, Long.parseLong(cadastro));
+    			
+    	func.setAtivo(0);
+    	
+    	manager.getTransaction().begin();
+    	manager.merge(func);
+    	manager.getTransaction().commit();
+    	
+    	manager.close();
+	    factory.close();
+
+		return"redirect:listaFuncionarios";
+	}
+	
+	public static List<Filho> geraListaFilhos(String[] nomeFilho, String[] dataFilho, Funcionario funcionario){
 		List<Filho> listaFilhos = new ArrayList<Filho>();
 		
 		for(int i = 0; i < nomeFilho.length; i++){
 			Filho filho = new Filho();
 			filho.setNome(nomeFilho[i]);
 			filho.setDataNascimento(UtilController.converteStringEmData(dataFilho[i]));
+			filho.setFuncionario(funcionario);
 			
 			listaFilhos.add(filho);
 		}
@@ -156,8 +198,8 @@ public class FuncionarioController {
 	public @ResponseBody List<Filho> getListaDependentes(String cadastro) {
 		EntityManagerFactory factory = Persistence.createEntityManagerFactory("funcionarios");
     	EntityManager manager = factory.createEntityManager();
-		
-    	Query query = manager.createQuery("SELECT f FROM Filho as f WHERE f.funcionario.cadastro = :cadastro ORDER BY f.id ASC");
+    	
+    	Query query = manager.createQuery("SELECT f FROM Filho f WHERE f.funcionario.cadastro = :cadastro");
     	query.setParameter("cadastro", Long.parseLong(cadastro));
     	
 		List<Filho> list = query.getResultList();

@@ -14,10 +14,13 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import br.com.fti.cadastro.controller.UtilController;
 
 @Entity
 @Table(name="filhos")
+@JsonIgnoreProperties(value= {"funcionario"})
 public class Filho {
 	
 	@Id

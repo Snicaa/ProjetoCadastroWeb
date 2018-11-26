@@ -16,6 +16,7 @@
 <div id="divFuncionario" class="">
 <a href="cadastrarFuncionario"><button>Cadastrar Funcionário</button></a>
 <a href="listaFuncionarios"><button>Lista de Funcionários</button></a>
+<a href="listaProfessores"><button>Lista de Professores</button></a>
 </div>
 </body>
 </html>

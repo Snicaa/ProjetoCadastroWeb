@@ -89,7 +89,7 @@
 						<input id="campoEmail" type="email" name="email" value="${aluno.email}" placeholder="exemplo: nome@gmail.com" required>
 						<span class="validacao"></span>
 					</div>
-					
+					<input id="resetar" type="reset" value="Limpar"/>
 				 	<input id="adicionar" class="button" type="submit" value="${aluno.matricula gt 0 ? 'Alterar' : 'Cadastrar'}"/>
 				</form>
 			</div>
@@ -201,7 +201,7 @@
 			}
 		});
 		
-		$("#campoCurso").blur(function(){
+		$("#campoCurso").on("change", function(){
 			if($(this).val() == "Selecionar..."){
 				$(this).closest(".campo").find(".validacao").html("Selecione um curso");
 				cursoTemErro = true;
